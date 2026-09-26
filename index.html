@@ -360,7 +360,27 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .lyr{font-family:var(--hz);font-size:17px;font-weight:500;letter-spacing:0}
 .lyrics{background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:14px 12px;line-height:2.1}
 .lyl{font-family:var(--hz);font-size:20px;min-height:1em;margin:2px 0}
-.lyl.empty{height:12px}
+.lyl.songbtn{margin-bottom:10px}
+.wdue{font-style:normal;font-size:11.5px;background:var(--red);color:#fff;border-radius:8px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.wstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
+.wstats div{background:var(--card);border:1px solid var(--gold-soft);border-radius:13px;padding:10px;text-align:center}
+.wstats b{display:block;font-size:24px;color:var(--red)}.wstats span{font-size:12px;color:var(--muted)}
+.wbox.big{width:min(260px,100%)}.wbox.mid{width:150px;margin-top:10px}
+.gslots{display:flex;justify-content:center;gap:6px;margin:6px auto 14px;width:max-content}
+.gslots.tb{flex-direction:column}
+.gs{width:64px;height:64px;border:2px dashed var(--gold);border-radius:12px;display:grid;place-items:center;font-family:var(--hz);font-size:34px;font-weight:700;color:var(--blue);background:var(--paper)}
+.gtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gt{font-family:var(--hz);font-size:30px;font-weight:600;border:1.5px solid var(--gold);background:var(--card);border-radius:12px;padding:10px 0;cursor:pointer}
+.gt:disabled{opacity:.3}
+.gform{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 6px;flex-wrap:wrap}
+.gp{font-family:var(--hz);font-size:30px;font-weight:700;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.gp small{font-family:var(--ui);font-size:11px;font-weight:500;color:var(--muted);margin-top:3px}
+.gp.big{font-size:42px;color:var(--red)}.gplus{font-size:22px;color:var(--muted)}
+.cmp{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.cmpi{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;background:var(--card);border:1px solid var(--gold-soft);text-align:left}
+.cmpi.on{border-color:#3E8E5A}.cmpi span{font-family:var(--hz);font-size:30px;font-weight:700;width:40px;text-align:center}
+.cmpi b{font-size:14px}.cmpi small{display:block;color:var(--muted);font-size:12.5px}
+.empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
 .lyw.l1{color:var(--blue);border-color:var(--blue)} .lyw.l2{color:var(--red);border-color:var(--red)}
@@ -478,14 +498,14 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790417195';
+    const V = '?v=1790430533';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
       DATA=got[0]; STROKES=got[1]; DLGS=got[2];
       (DATA.akeys||[]).forEach(k=>{ if(!(k in AUDIO)) AUDIO[k]=true; });
     }
-    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs();
+    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write();
     if(box) box.remove();
     if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json'] : ['a1.json','ac.json','a2.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
@@ -1098,6 +1118,8 @@ function renderSetup(){
   root().innerHTML = `
   <div class="qwrap">
     <h2 class="qt">Bài tập và kiểm tra</h2>
+    <button class="songbtn" id="qWrite"><span>✍️</span><div><b>Luyện viết mỗi ngày${A.writeDue ? ` <em class="wdue">${A.writeDue()} chữ cần ôn</em>` : ''}</b><small>Tô chữ, viết có gợi ý, viết theo trí nhớ; tự nhắc ôn</small></div></button>
+    <button class="songbtn" id="qBuild"><span>🧩</span><div><b>Ghép chữ & chữ dễ nhầm</b><small>Ghép thành phần thành chữ, phân biệt 已/己, 买/卖…</small></div></button>
     <button class="songbtn" id="qSongs"><span>🎵</span><div><b>Học qua bài hát</b><small>Dán lời bài hát, trang tự tô màu từ HSK 1 và HSK 2</small></div></button>
     <div class="qsec"><p>Chế độ</p>
       <div class="seg" id="qMode"><button data-v="practice" aria-pressed="${cfg.mode==='practice'}">Luyện tập</button><button data-v="test" aria-pressed="${cfg.mode==='test'}">Kiểm tra</button></div>
@@ -1121,6 +1143,8 @@ function renderSetup(){
   $('#qCount').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; cfg.count=+b.dataset.v; saveCfg(); renderSetup(); };
   $('#qStart').onclick = ()=>start(poolFor(), cfg.types);
   $('#qSongs').onclick = ()=>A.openSongs && A.openSongs();
+  $('#qWrite').onclick = ()=>A.openWrite && A.openWrite();
+  $('#qBuild').onclick = ()=>A.openBuild && A.openBuild();
   root().querySelectorAll('.ditem').forEach(b=>b.onclick=()=>renderReader(DLG_ALL[+b.dataset.d]));
 }
 
@@ -1463,6 +1487,226 @@ A.onQuizTab = ()=>{ if(!S) renderSetup(); };
 A.quizHome = ()=>{ S=null; renderSetup(); };
 if(A.onLevel) A.onLevel(()=>{ if(document.body.dataset.tab==='quiz'){ S=null; renderSetup(); } });
 A.startCustomQuiz = (pool)=>{ A.showTab('quiz'); const ts = cfg.types.filter(t=>!DTYPES.has(t)); start(pool, ts.length?ts:TYPES.filter(t=>!t.d).map(t=>t.id), Math.min(20, Math.max(8, pool.length*2)), 'practice'); };
+};
+
+</script>
+<script>window.__write = function(){
+const A = window.APP; if(!A) return;
+const {W, C, R, esc, cap, SPK, store, STROKES} = A;
+const DEC = (window.DATA && DATA.dec) || {};
+const CM = (window.DATA && DATA.comp) || {};
+const $ = s => document.querySelector(s);
+const root = () => $('#quiz');
+const rnd = n => Math.floor(Math.random()*n);
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const CIT = A.CIT || {};
+const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset()*60000)/86400000);
+const IV = [0,1,3,7,14,30,60,120];
+let srs = store.get('wsrs', {});
+let meta = Object.assign({perDay:8, streak:0, last:-1, doneToday:0, day:-1}, store.get('wmeta', {}));
+const saveS = ()=>{ store.set('wsrs', srs); store.set('wmeta', meta); };
+const wordFor = c => W.find(w=>w.w===c) || W.find(w=>w.w.includes(c));
+const orderChars = () => { const seen=[]; W.forEach(w=>{ if(!(A.inLv?A.inLv(w):true)) return; [...w.w].forEach(c=>{ if(C[c] && STROKES[c] && !seen.includes(c)) seen.push(c); }); }); return seen; };
+function info(c){ const w = wordFor(c); return {py: CIT[c]||'', hv: C[c].hv, vn: C[c].vn, w}; }
+function compLabel(x){ if(C[x]) return (CIT[x]||'')+' – '+cap(C[x].hv); if(CM[x]) return CM[x].py+' – '+cap(CM[x].hv); if(R[x]) return 'bộ '+R[x].hv; return ''; }
+
+/* ================= 1. Writing: 3 steps + spaced review ================= */
+function dueList(){
+  const t = today(); const chars = orderChars();
+  const due = chars.filter(c=>srs[c] && srs[c].due<=t);
+  if(meta.day!==t){ meta.day=t; meta.doneToday=0; }
+  const newLeft = Math.max(0, meta.perDay - meta.doneToday);
+  const fresh = chars.filter(c=>!srs[c]).slice(0, newLeft);
+  return {due, fresh, total:chars.length, learned:chars.filter(c=>srs[c] && srs[c].box>=3).length, started:chars.filter(c=>srs[c]).length};
+}
+function home(){
+  A.stopSpeak();
+  const d = dueList();
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="wBack">←</button><div class="dtitle left">Luyện viết mỗi ngày<small>Tô chữ → viết có gợi ý → viết theo trí nhớ</small></div></div>
+    <div class="wstats"><div><b>${d.due.length + d.fresh.length}</b><span>chữ hôm nay</span></div><div><b>${meta.streak}</b><span>ngày liên tục</span></div><div><b>${d.learned}</b><span>/${d.total} chữ đã nhớ</span></div></div>
+    <p class="qhint">${d.due.length} chữ đến hạn ôn, ${d.fresh.length} chữ mới. Chữ viết sai sẽ được hỏi lại sớm hơn; chữ nhớ tốt sẽ giãn ra 3 ngày, 1 tuần, 1 tháng…</p>
+    <div class="qsec"><p>Số chữ mới mỗi ngày</p><div class="seg" id="wPer">${[5,8,12,20].map(n=>`<button data-v="${n}" aria-pressed="${meta.perDay===n}">${n}</button>`).join('')}</div></div>
+    <button class="qstart" id="wGo" ${d.due.length+d.fresh.length?'':'disabled'}>${d.due.length+d.fresh.length?'Bắt đầu luyện':'Hôm nay đã luyện xong 🎉'}</button>
+    ${d.due.length+d.fresh.length?'':'<button class="row-btn" id="wExtra">Luyện thêm 5 chữ mới</button>'}
+  </div>`;
+  $('#wBack').onclick = ()=>A.quizHome();
+  $('#wPer').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; meta.perDay=+b.dataset.v; saveS(); home(); };
+  const go = $('#wGo'); if(go) go.onclick = ()=>startWrite(shuffle(d.due).concat(d.fresh));
+  const ex = $('#wExtra'); if(ex) ex.onclick = ()=>{ const chars = orderChars().filter(c=>!srs[c]).slice(0,5); if(chars.length) startWrite(chars); };
+}
+let WS = null;
+function startWrite(list){
+  WS = {q: list.map(c=>({c, isNew: !srs[c], step: srs[c] ? 3 : 1})), i:0, res:[], again:new Set()};
+  stepView();
+}
+function stepView(){
+  A.stopSpeak();
+  const it = WS.q[WS.i]; if(!it){ finishWrite(); return; }
+  const c = it.c, f = info(c);
+  const stepName = ['','Bậc 1: Tô theo nét mờ','Bậc 2: Viết, sai sẽ có gợi ý','Bậc 3: Viết theo trí nhớ'][it.step];
+  const ex = f.w ? `${esc(f.w.w)} (${esc(f.w.py)}) – ${esc(f.w.vn)}` : '';
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="wQuit">✕</button><div class="qbar"><i style="width:${WS.i/WS.q.length*100}%"></i></div><span class="qcnt">${WS.i+1}/${WS.q.length}</span></div>
+    <div class="qtype">${stepName}${it.isNew?' <span>Chữ mới</span>':' <span>Ôn tập</span>'}</div>
+    <div class="qbody">
+      <div class="pv">${esc(cap(f.vn))}</div>
+      <div class="pp">${esc(f.py)} · ${esc(cap(f.hv))} ${A.pbtn ? A.pbtn(c) : ''}</div>
+      ${it.step<3 || it.showEx ? `<div class="pe">${ex}</div>` : `<div class="pe">Từ: ${f.w ? esc(f.w.w.replace(c,'？')) : ''}</div>`}
+      <div class="wbox big" id="wB"></div>
+      <div class="btns"><button id="wHint">${it.step===1?'Xem mẫu':'Gợi ý'}</button><button id="wSkip">Không nhớ</button></div>
+      <div id="wFb"></div>
+    </div></div>`;
+  $('#wQuit').onclick = ()=>{ WS=null; home(); };
+  const box = $('#wB'); const size = Math.min(260, box.clientWidth || 260);
+  const cs = getComputedStyle(document.documentElement);
+  const wr = HanziWriter.create(box, c, { width:size, height:size, padding:12, showCharacter:false, showOutline: it.step===1,
+    strokeColor:cs.getPropertyValue('--ink').trim(), outlineColor:cs.getPropertyValue('--gold-soft').trim(), drawingColor:cs.getPropertyValue('--red').trim(), highlightColor:cs.getPropertyValue('--blue').trim(),
+    radicalColor:cs.getPropertyValue('--blue').trim(), charDataLoader:(ch,done)=>done(STROKES[ch]) });
+  let hinted = false;
+  wr.quiz({ showHintAfterMisses: it.step===1 ? 1 : it.step===2 ? 2 : 4, onComplete: sm=>done(sm.totalMistakes) });
+  $('#wHint').onclick = ()=>{ hinted = true; if(it.step===1){ wr.cancelQuiz(); wr.animateCharacter({onComplete:()=>wr.quiz({showHintAfterMisses:1, onComplete:sm=>done(sm.totalMistakes)})}); } else { wr.showOutline(); } };
+  $('#wSkip').onclick = ()=>{ try{ wr.cancelQuiz(); }catch(e){} wr.showCharacter(); wr.animateCharacter(); done(99, true); };
+  function done(mist, skipped){
+    $('#wHint').disabled = true; $('#wSkip').disabled = true;
+    const strokes = STROKES[c].strokes.length;
+    const good = !skipped && !hinted && mist <= Math.max(1, Math.floor(strokes/5));
+    let msg;
+    if(it.step<3){ msg = good ? 'Tốt! Sang bậc tiếp theo.' : 'Chưa chuẩn, thử lại bậc này nhé.'; }
+    else { msg = good ? (mist===0 ? 'Hoàn hảo! Nhớ chữ rất tốt.' : 'Đúng rồi, còn sai vài nét.') : 'Chưa nhớ, chữ này sẽ được hỏi lại.'; }
+    $('#wFb').innerHTML = `<div class="fb ${good?'good':'nope'}"><b>${msg}</b><div class="fbx">${c} – ${strokes} nét, sai ${skipped?'–':mist} nét. ${esc(C[c].note)}</div><button class="qstart" id="wNext">Tiếp tục</button></div>`;
+    $('#wNext').onclick = ()=>advance(good, mist, skipped);
+  }
+  function advance(good, mist, skipped){
+    if(it.step<3){
+      it.tries = (it.tries||0)+1;
+      if(good || it.tries>=2){ it.step++; it.tries=0; }
+      if(it.step===3 && it.isNew){ // new char: finish learning; memory test later in session
+        grade(c, true, mist, true); it.showEx=false; WS.q.push({c, isNew:false, step:3, tail:true}); WS.i++; stepView(); return; }
+      stepView(); return;
+    }
+    if(!it.redo) grade(c, good, mist, false);
+    if(!good && !WS.again.has(c)){ WS.again.add(c); WS.q.push({c, isNew:false, step:2, redo:true}); }
+    WS.res.push({c, good}); WS.i++; stepView();
+  }
+}
+function grade(c, good, mist, learningPass){
+  const t = today(); const s = srs[c] || {box:0, due:t, lapses:0};
+  if(learningPass){ s.box = Math.max(s.box,1); s.due = t+1; if(!srs[c]){ meta.doneToday++; } }
+  else if(good){ s.box = Math.min(IV.length-1, s.box+1); s.due = t + IV[s.box]; }
+  else { s.lapses++; s.box = 1; s.due = t+1; }
+  srs[c] = s;
+  if(meta.last!==t){ meta.streak = (meta.last===t-1) ? meta.streak+1 : 1; meta.last = t; }
+  saveS();
+}
+function finishWrite(){
+  const ok = WS.res.filter(r=>r.good).length, n = WS.res.length;
+  const bad = [...new Set(WS.res.filter(r=>!r.good).map(r=>r.c))];
+  root().innerHTML = `<div class="qwrap">
+    <div class="score"><div class="ring" style="--p:${n?Math.round(ok/n*100):100}"><span>${ok}/${n}</span></div><div><b>Xong buổi luyện viết!</b><p>Chuỗi ${meta.streak} ngày liên tục. Ngày mai trang sẽ nhắc lại các chữ đến hạn.</p></div></div>
+    ${bad.length?`<div class="qsec"><p>Chữ cần luyện thêm</p><div class="lychips">${bad.map(c=>`<button class="fchip" data-jc="${c}">${c}</button>`).join('')}</div></div>`:''}
+    <div class="btns col"><button class="pri" id="wHome">Về trang luyện viết</button><button id="wQz">Về Bài tập</button></div></div>`;
+  root().querySelectorAll('.fchip').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.jc));
+  $('#wHome').onclick = ()=>{ WS=null; home(); };
+  $('#wQz').onclick = ()=>{ WS=null; A.quizHome(); };
+}
+
+/* ================= 2. Build characters + confusables ================= */
+const CONF = [['已','己'],['大','太','天','夫'],['买','卖'],['午','牛'],['日','目','白'],['土','士'],['休','体'],['问','间','们'],['今','会'],['子','了'],['他','她','它'],['左','右','在','有'],['白','百'],['小','少'],['儿','几','九'],['东','车'],['见','贝'],['请','情','晴','睛'],['元','远','玩','完'],['口','回','四'],['人','个','从'],['木','本','米'],['千','十'],['方','万'],['门','问','间'],['去','在'],['话','说','语'],['冷','零'],['怎','作','昨'],['往','住'],['快','块'],['吗','妈'],['跑','包'],['师','帅'],['找','我','钱'],['早','草'],['男','女','妈']];
+let G = null;
+function buildHome(){
+  A.stopSpeak();
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="gBack">←</button><div class="dtitle left">Ghép chữ & chữ dễ nhầm<small>Hiểu cấu tạo để nhớ mặt chữ và không viết nhầm</small></div></div>
+    <button class="songbtn" id="gBuild"><span>🧩</span><div><b>Ghép chữ từ thành phần</b><small>Nhìn nghĩa và pinyin, chọn 2 thành phần ghép thành chữ</small></div></button>
+    <button class="songbtn" id="gConf"><span>🔍</span><div><b>Phân biệt chữ dễ nhầm</b><small>已/己, 大/太/天, 买/卖, 午/牛…</small></div></button>
+  </div>`;
+  $('#gBack').onclick = ()=>A.quizHome();
+  $('#gBuild').onclick = ()=>startGame('build');
+  $('#gConf').onclick = ()=>startGame('conf');
+}
+function startGame(mode){
+  let items;
+  if(mode==='build'){ items = shuffle(Object.keys(DEC).filter(c=>C[c] && LVc(c))).slice(0,10).map(c=>({c})); }
+  else { const groups = CONF.map(g=>g.filter(c=>C[c])).filter(g=>g.length>=2 && g.some(LVc)); items = shuffle(groups).slice(0,10).map(g=>{ const cand = g.filter(LVc); return {g, c: cand[rnd(cand.length)]}; }); }
+  G = {mode, items, i:0, ok:0, wrong:[]};
+  gameView();
+}
+function gameView(){
+  const it = G.items[G.i]; if(!it){ gameEnd(); return; }
+  const c = it.c, f = info(c);
+  let body;
+  if(G.mode==='build'){
+    const [op,a,b] = DEC[c];
+    const pool = [...new Set(Object.values(DEC).flatMap(x=>[x[1],x[2]]))].filter(x=>x!==a && x!==b);
+    // prefer look-alike distractors: components sharing a stroke-count neighbourhood are hard to know; use random + radical variants
+    const opts = shuffle([a,b].concat(shuffle(pool).slice(0,4)));
+    it.need = [a,b]; it.pick = [];
+    body = `<div class="pv">${esc(cap(f.vn))}</div><div class="pp">${esc(f.py)} · ${esc(cap(f.hv))}</div>
+      <p class="pq">Chọn 2 thành phần ghép thành chữ ${op==='⿰'?'(trái + phải)':'(trên + dưới)'}</p>
+      <div class="gslots ${op==='⿰'?'lr':'tb'}"><span class="gs" id="gs0">？</span><span class="gs" id="gs1">？</span></div>
+      <div class="gtiles">${opts.map(x=>`<button class="gt" data-x="${esc(x)}">${esc(x)}</button>`).join('')}</div>`;
+  } else {
+    const w = f.w; const blank = w ? esc(w.w).replace(esc(c), '<span class="blank">？</span>') : '';
+    it.opts = shuffle(it.g);
+    body = `<div class="psent">${blank}</div><div class="pp">${w?esc(w.py):''}</div><div class="pv">${w?esc(cap(w.vn)):''}</div>
+      <p class="pq">Chọn đúng chữ còn thiếu</p>
+      <div class="opts hz">${it.opts.map((x,i)=>`<button class="opt" data-i="${i}">${x}</button>`).join('')}</div>`;
+  }
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="gQuit">✕</button><div class="qbar"><i style="width:${G.i/G.items.length*100}%"></i></div><span class="qcnt">${G.i+1}/${G.items.length}</span></div>
+    <div class="qtype">${G.mode==='build'?'Ghép chữ':'Chữ dễ nhầm'} <span>Đúng ${G.ok}/${G.i}</span></div>
+    <div class="qbody">${body}</div><div id="gFb"></div></div>`;
+  $('#gQuit').onclick = ()=>buildHome();
+  if(G.mode==='build'){
+    root().querySelectorAll('.gt').forEach(b=>b.onclick=()=>{
+      if(b.disabled || it.pick.length>=2) return;
+      it.pick.push(b.dataset.x); b.disabled = true; $('#gs'+(it.pick.length-1)).textContent = b.dataset.x;
+      if(it.pick.length===2){
+        const ok = (it.pick[0]===it.need[0] && it.pick[1]===it.need[1]) || (it.pick[0]===it.need[1] && it.pick[1]===it.need[0]);
+        const exact = it.pick[0]===it.need[0] && it.pick[1]===it.need[1];
+        answer(ok, ok && !exact ? 'Đúng thành phần, nhưng thứ tự vị trí ngược lại.' : '');
+      }
+    });
+  } else {
+    root().querySelectorAll('.opt[data-i]').forEach(b=>b.onclick=()=>{
+      const x = it.opts[+b.dataset.i]; const ok = x===c;
+      root().querySelectorAll('.opt').forEach(o=>{ o.disabled=true; if(it.opts[+o.dataset.i]===c) o.classList.add('ok'); });
+      if(!ok) b.classList.add('bad');
+      answer(ok, '');
+    });
+  }
+}
+function answer(ok, note){
+  const it = G.items[G.i], c = it.c;
+  if(ok) G.ok++; else G.wrong.push(c);
+  let extra;
+  if(G.mode==='build'){
+    const [op,a,b] = DEC[c];
+    extra = `<div class="gform"><span class="gp">${a}<small>${esc(compLabel(a))}</small></span><span class="gplus">+</span><span class="gp">${b}<small>${esc(compLabel(b))}</small></span><span class="gplus">=</span><span class="gp big">${c}</span></div>
+      <div class="fbx"><b>Mẹo nhớ:</b> ${esc(C[c].note)}</div><div class="wbox mid" id="gAnim"></div>`;
+  } else {
+    extra = `<div class="cmp">${it.g.map(x=>`<div class="cmpi${x===c?' on':''}"><span>${x}</span><div><b>${esc(CIT[x]||'')} · ${esc(cap(C[x].hv))}</b><small>${esc(C[x].vn)}</small></div></div>`).join('')}</div>`;
+  }
+  $('#gFb').innerHTML = `<div class="fb ${ok?'good':'nope'}"><b>${ok?'Chính xác!':'Chưa đúng'}</b>${note?`<div class="fbx">${esc(note)}</div>`:''}${extra}<button class="qstart" id="gNext">${G.i+1<G.items.length?'Câu tiếp theo':'Xem kết quả'}</button></div>`;
+  $('#gNext').onclick = ()=>{ G.i++; gameView(); root().scrollTop=0; };
+  const an = $('#gAnim');
+  if(an && STROKES[c]){ const cs = getComputedStyle(document.documentElement); const w = HanziWriter.create(an, c, {width:150,height:150,padding:8,showOutline:true,strokeColor:cs.getPropertyValue('--ink').trim(),radicalColor:cs.getPropertyValue('--blue').trim(),outlineColor:cs.getPropertyValue('--gold-soft').trim(),charDataLoader:(ch,d)=>d(STROKES[ch])}); setTimeout(()=>w.animateCharacter(),300); }
+  setTimeout(()=>$('#gFb').scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+function gameEnd(){
+  const n = G.items.length;
+  root().innerHTML = `<div class="qwrap"><div class="score"><div class="ring" style="--p:${Math.round(G.ok/n*100)}"><span>${G.ok}/${n}</span></div><div><b>${G.mode==='build'?'Ghép chữ':'Chữ dễ nhầm'}</b><p>${G.ok===n?'Xuất sắc! 太棒了！':'Ôn lại các chữ sai rồi chơi lượt mới nhé. 加油！'}</p></div></div>
+    ${G.wrong.length?`<div class="qsec"><p>Chữ cần xem lại</p><div class="lychips">${[...new Set(G.wrong)].map(c=>`<button class="fchip" data-jc="${c}">${c}</button>`).join('')}</div></div>`:''}
+    <div class="btns col"><button class="pri" id="gAgain">Chơi lượt mới</button><button id="gHome">Về trang ghép chữ</button></div></div>`;
+  root().querySelectorAll('.fchip').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.jc));
+  $('#gAgain').onclick = ()=>startGame(G.mode);
+  $('#gHome').onclick = ()=>buildHome();
+}
+A.openWrite = ()=>{ A.showTab('quiz'); home(); };
+A.openBuild = ()=>{ A.showTab('quiz'); buildHome(); };
+A.writeDue = ()=>{ const d = dueList(); return d.due.length + d.fresh.length; };
 };
 
 </script>
