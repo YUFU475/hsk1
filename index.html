@@ -189,7 +189,8 @@ button:focus-visible,.front:focus-visible{outline:2.5px solid var(--red);outline
 .tabs button[aria-selected="true"]{background:var(--card);color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 body:not([data-tab="cards"]) .stage,body:not([data-tab="cards"]) .bottom,body:not([data-tab="cards"]) .progress,body:not([data-tab="cards"]) #btnToc,body:not([data-tab="cards"]) #btnList{display:none}
 body:not([data-tab="quiz"]) .quiz{display:none}
-body:not([data-tab="hz"]) .hzv{display:none}
+body:not([data-tab="hz"]) #hzv{display:none}
+body:not([data-tab="rad"]) #radv{display:none}
 .quiz,.hzv{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:0 -14px;padding:0 14px 24px}
 .qwrap{padding-top:4px}
 .qt{font-size:20px;margin:6px 0 14px}
@@ -361,7 +362,7 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .lyrics{background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:14px 12px;line-height:2.1}
 .lyl{font-family:var(--hz);font-size:20px;min-height:1em;margin:2px 0}
 .lyl.songbtn{margin-bottom:10px}
-.wdue{font-style:normal;font-size:11.5px;background:var(--red);color:#fff;border-radius:8px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.wdue{white-space:nowrap;display:inline-block;font-style:normal;font-size:11.5px;background:var(--red);color:#fff;border-radius:8px;padding:1px 7px;margin-left:6px;vertical-align:1px}
 .wstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
 .wstats div{background:var(--card);border:1px solid var(--gold-soft);border-radius:13px;padding:10px;text-align:center}
 .wstats b{display:block;font-size:24px;color:var(--red)}.wstats span{font-size:12px;color:var(--muted)}
@@ -409,6 +410,11 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .kvars{display:flex;flex-wrap:wrap;gap:10px}
 .kvar{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--hz);font-size:15px;color:var(--red)}
 .kvar .rfg{cursor:pointer}
+.top .tabs{flex:1}
+.tabs button{font-size:13px;padding:9px 2px}
+.lvrow{display:flex;gap:6px;align-items:center;padding:0 0 10px}
+.lvrow .lvbar{flex:1;padding:0}
+.icon-btn.sm{width:36px;height:36px;border-radius:10px}.icon-btn.sm svg{width:18px;height:18px}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -433,18 +439,19 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 <div id="boot" class="boot"><div class="bspin"></div><p>Đang tải bộ thẻ…</p></div>
 <div class="app">
   <header class="top">
-    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true">Thẻ từ</button><button id="tabHz" role="tab" aria-selected="false">Chữ Hán</button><button id="tabQuiz" role="tab" aria-selected="false">Bài tập</button></div>
-    <button class="icon-btn" id="btnToc" aria-label="Mục lục chủ đề" title="Mục lục">
+    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true">Thẻ từ</button><button id="tabHz" role="tab" aria-selected="false">Chữ Hán</button><button id="tabRad" role="tab" aria-selected="false">Bộ thủ</button><button id="tabQuiz" role="tab" aria-selected="false">Bài tập</button></div>
+  </header>
+  <div class="lvrow"><div class="lvbar" id="lvbar"><button data-v="1">HSK 1</button><button data-v="2">HSK 2</button><button data-v="all">Cả hai</button></div>
+    <button class="icon-btn sm" id="btnToc" aria-label="Mục lục chủ đề" title="Mục lục">
       <svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg>
     </button>
-    <button class="icon-btn" id="btnList" aria-label="Danh sách từ" title="Danh sách">
+    <button class="icon-btn sm" id="btnList" aria-label="Danh sách từ" title="Danh sách">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     </button>
-    <button class="icon-btn" id="btnSet" aria-label="Tuỳ chọn" title="Tuỳ chọn">
+    <button class="icon-btn sm" id="btnSet" aria-label="Tuỳ chọn" title="Tuỳ chọn">
       <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
     </button>
-  </header>
-  <div class="lvbar" id="lvbar"><button data-v="1">HSK 1</button><button data-v="2">HSK 2</button><button data-v="all">Cả hai</button></div>
+  </div>
   <div class="progress"><div class="bar"><i id="bar"></i></div><span class="counter" id="counter"></span></div>
 
   <main class="stage" id="stage">
@@ -466,6 +473,7 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
   </footer>
   <main class="quiz" id="quiz" aria-live="polite"></main>
   <main class="hzv" id="hzv"></main>
+  <main class="hzv radv" id="radv"></main>
 </div>
 
 <div class="toast" id="toast" role="status"></div>
@@ -527,7 +535,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790432462';
+    const V = '?v=1790433007';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -917,15 +925,17 @@ render();
 setTimeout(checkHash, 300);
 function showTab(t){
   document.body.dataset.tab = t;
-  $('#tabCards').setAttribute('aria-selected', t==='cards'); $('#tabQuiz').setAttribute('aria-selected', t==='quiz'); $('#tabHz').setAttribute('aria-selected', t==='hz');
+  $('#tabCards').setAttribute('aria-selected', t==='cards'); $('#tabQuiz').setAttribute('aria-selected', t==='quiz'); $('#tabHz').setAttribute('aria-selected', t==='hz'); $('#tabRad').setAttribute('aria-selected', t==='rad');
   stopSpeak();
   if(t==='quiz'){ setFlip(false); window.APP.onQuizTab && window.APP.onQuizTab(); }
   else if(t==='hz'){ setFlip(false); window.APP.onHzTab && window.APP.onHzTab(); }
+  else if(t==='rad'){ setFlip(false); window.APP.onRadTab && window.APP.onRadTab(); }
   else { render(); }
 }
 $('#tabCards').onclick = ()=>showTab('cards');
 $('#tabQuiz').onclick = ()=>showTab('quiz');
 $('#tabHz').onclick = ()=>showTab('hz');
+$('#tabRad').onclick = ()=>showTab('rad');
 function syncLv(){ $('#lvbar').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===opts.level)); }
 syncLv();
 const lvHooks = [];
@@ -1525,7 +1535,10 @@ const {C, esc, cap, STROKES} = A;
 const FAM = (window.DATA && DATA.radfam) || [];
 const DEC = (window.DATA && DATA.dec) || {};
 const $ = s => document.querySelector(s);
-const root = () => $('#hzv');
+const root = () => $('#radv');
+let rview = A.store.get('radView','common');
+const sw = v => `<div class="seg hzsw" id="radSw"><button data-v="common" aria-pressed="${v==='common'}">Bộ thủ hay gặp (46)</button><button data-v="all" aria-pressed="${v==='all'}">Tất cả bộ thủ (214)</button></div>`;
+function wireRS(){ const s=$('#radSw'); if(s) s.onclick=e=>{ const b=e.target.closest('button'); if(!b) return; rview=b.dataset.v; A.store.set('radView',rview); rview==='all'?all():list(); root().scrollTop=0; }; }
 const CIT = A.CIT || {};
 const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
 let cover = A.store.get('radCover', false);
@@ -1554,11 +1567,12 @@ function writerInto(el, g, size){
   return HanziWriter.create(el, g, {width:size, height:size, padding:6, strokeColor:cs.getPropertyValue('--ink').trim(), outlineColor:cs.getPropertyValue('--gold-soft').trim(), highlightColor:cs.getPropertyValue('--red').trim(), strokeAnimationSpeed:1, delayBetweenStrokes:250, charDataLoader:(ch,d)=>d(STROKES[ch])});
 }
 function list(){
-  root().innerHTML = `<div class="qwrap">${A.hzSwitch ? A.hzSwitch('rad') : ''}
+  root().innerHTML = `<div class="qwrap">${sw('common')}
     <h2 class="qt">Bộ thủ thông dụng</h2>
     <p class="qhint" style="margin-top:-8px!important">${FAM.length} bộ thủ hay gặp trong HSK 1–2, kèm dạng gốc, dạng biến thể và vị trí trong chữ. Chạm để xem thẻ.</p>
     <div class="rgrid">${FAM.map((f,i)=>`<button class="rtile" data-i="${i}"><span class="re">${f.emo}</span><span class="rb">${f.b}</span><span class="rv">${[...new Set(f.forms.map(x=>x.g).filter(g=>g!==f.b))].join(' ')||'&nbsp;'}</span><span class="rh">${esc(cap(f.hv))}</span></button>`).join('')}</div></div>`;
   root().querySelectorAll('.rtile').forEach(b=>b.onclick=()=>card(+b.dataset.i));
+  wireRS();
 }
 function card(i){
   A.stopSpeak();
@@ -1611,7 +1625,7 @@ function all(){
   const q = fold(kq);
   const items = KX.filter(k=>!q || fold(k.hv).includes(q) || fold(k.py).includes(q) || fold(k.vn).includes(q) || k.g===kq || k.v.includes(kq) || String(k.n)===kq);
   const groups = {}; items.forEach(k=>{ (groups[k.s]=groups[k.s]||[]).push(k); });
-  root().innerHTML = `<div class="qwrap">${A.hzSwitch ? A.hzSwitch('all') : ''}
+  root().innerHTML = `<div class="qwrap">${sw('all')}
     <h2 class="qt">214 bộ thủ</h2>
     <p class="qhint" style="margin-top:-8px!important">Bộ thủ Khang Hy, xếp theo số nét. Dạng biến thể màu đỏ. Chạm vào bộ để xem thẻ.</p>
     <input class="search" id="kxQ" type="search" placeholder="Tìm theo Hán Việt, pinyin, nghĩa hoặc số thứ tự…" value="${esc(kq)}">
@@ -1619,7 +1633,7 @@ function all(){
   </div>`;
   const inp = $('#kxQ'); inp.oninput = ()=>{ kq = inp.value.trim(); const pos = inp.selectionStart; all(); const i2 = $('#kxQ'); i2.focus(); try{ i2.setSelectionRange(pos,pos); }catch(e){} };
   root().querySelectorAll('.kxt').forEach(b=>b.onclick=()=>kcard(+b.dataset.n));
-  if(A.hzWire) A.hzWire();
+  wireRS();
 }
 function kcard(n){
   A.stopSpeak();
@@ -1642,6 +1656,8 @@ function kcard(n){
   root().scrollTop = 0;
 }
 A.radAll = all;
+A.onRadTab = ()=>{ rview==='all' ? all() : list(); };
+if(A.onLevel) A.onLevel(()=>{ if(document.body.dataset.tab==='rad') A.onRadTab(); });
 };
 
 </script>
@@ -2031,8 +2047,6 @@ function practiceBtn(chars){ return `<button class="gprac" data-chars="${chars.j
 
 const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
 function render(){
-  if(st.view==='rad' && A.radList){ A.radList(); wireSw(); return; }
-  if(st.view==='all' && A.radAll){ A.radAll(); wireSw(); return; }
   const all = Object.keys(C).filter(LVc);
   const G = { sem:{}, pho:{} }; Object.entries(GROUPS.sem).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.sem[k]=f; }); Object.entries(GROUPS.pho).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.pho[k]=f; });
   const counts = Object.fromEntries(TYPES.map(t=>[t.id, all.filter(c=>C[c].type===t.id).length]));
@@ -2068,14 +2082,13 @@ function render(){
       body += `<div class="grp2"><div class="hts">${cs.map(c=>tile(c)).join('')}</div><div class="hnotes">${cs.map(c=>`<p><b>${c}</b> ${esc(C[c].note)}</p>`).join('')}</div></div>`;
     }
   }
-  root().innerHTML = `<div class="qwrap">${A.hzSwitch('cls')}
+  root().innerHTML = `<div class="qwrap">
     <h2 class="qt">Phân loại chữ Hán</h2>
     <p class="qhint" style="margin-top:-8px!important">${all.length} chữ ${A.level&&A.level()==='2'?'mới của HSK 2':A.level&&A.level()==='1'?'của HSK 1':'của HSK 1 và HSK 2'}, chia theo cách cấu tạo. Chạm vào chữ để mở thẻ.</p>
     <div class="tgrid">${TYPES.map(t=>`<button class="tcard${t.id===st.type?' on':''}" data-t="${t.id}"><b>${t.short}</b><span>${counts[t.id]} chữ</span></button>`).join('')}</div>
     <p class="tdesc">${esc(T.desc)}</p>
     ${body}
   </div>`;
-  wireSw();
   root().querySelectorAll('.tcard').forEach(b=>b.onclick=()=>{ st.type=b.dataset.t; save(); render(); root().scrollTop=0; });
   const by = $('#hzBy'); if(by) by.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.by=b.dataset.v; save(); render(); };
   root().querySelectorAll('.ht').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.c));
