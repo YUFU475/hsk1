@@ -352,6 +352,7 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .tochead{font-size:13px;font-weight:800;color:var(--red);margin:14px 6px 4px;letter-spacing:.02em}
 .h2d{font-size:9.5px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;padding:0 4px;margin-top:2px}
 .chip small{font-size:10px;color:var(--red);font-weight:700}
+.lvc{display:block;font-style:normal;font-size:11.5px;color:var(--red);font-weight:600;margin-top:1px}
 .empty{padding:40px 10px;text-align:center;color:var(--muted);font-size:14px}
 @media (max-height:640px){.front .tile{--ts:84px}}
 @media (prefers-reduced-motion:reduce){.card,.sheet,.scrim,.bar i{transition:none}}
@@ -455,7 +456,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790407284';
+    const V = '?v=1790409366';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -489,13 +490,18 @@ function applyTheme(){
 }
 const TLV = DATA.topicLv || TOP.map(()=>1);
 const inLv = w => opts.level==='all' || String(w.lv||1)===opts.level;
+const MT = DATA.mtopics || TOP, TMAP = DATA.tmap || TOP.map((_,i)=>i);
+const merged = () => opts.level==='all';
+const tkey = w => merged() ? TMAP[w.t] : w.t;
+const tname = w => merged() ? MT[TMAP[w.t]] : TOP[w.t];
 const lvTag = lv => `<span class="lvb l${lv||1}">HSK ${lv||1}</span>`;
 function buildOrder(keepId){
   let ids = W.map((_,i)=>i).filter(i=>inLv(W[i]));
+  if(merged()) ids.sort((a,b)=> (TMAP[W[a].t]-TMAP[W[b].t]) || ((W[a].lv||1)-(W[b].lv||1)) || (a-b));
   if(opts.filter==='todo') ids = ids.filter(i=>!known.has(W[i].n));
   if(opts.filter==='done') ids = ids.filter(i=>known.has(W[i].n));
   if(shuffled){
-    const g = {}; ids.forEach(i=>{ (g[W[i].t] = g[W[i].t] || []).push(i); });
+    const g = {}; ids.forEach(i=>{ const k=tkey(W[i]); (g[k] = g[k] || []).push(i); });
     ids = [];
     Object.keys(g).sort((a,b)=>a-b).forEach(k=>{ const a=g[k]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } ids.push(...a); });
   }
@@ -547,8 +553,8 @@ function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 function renderFront(w){
   const n = [...w.w].length;
   const ts = n===1 ? 150 : n===2 ? 118 : 92;
-  const inT = order.filter(i=>W[i].t===w.t); const k = inT.indexOf(order[pos]);
-  $('#fNum').innerHTML = `<b>${esc(TOP[w.t])}${lvTag(w.lv)}</b>Thẻ ${k+1} / ${inT.length}`;
+  const inT = order.filter(i=>tkey(W[i])===tkey(w)); const k = inT.indexOf(order[pos]);
+  $('#fNum').innerHTML = `<b>${esc(tname(w))}${lvTag(w.lv)}</b>Thẻ ${k+1} / ${inT.length}`;
   let h;
   if(opts.front==='vn'){
     h = `<div class="vn-q">${esc(cap(w.vn))}</div><div class="en-q">${esc(w.en)}</div>`;
@@ -585,7 +591,7 @@ function renderBack(w){
         ${famChips(c)}
       </div></div>`;
   });
-  $('#back').innerHTML = `<span class="topic-tag">${esc(TOP[w.t])}</span>${lvTag(w.lv)}
+  $('#back').innerHTML = `<span class="topic-tag">${esc(tname(w))}</span>${lvTag(w.lv)}
     <div class="head" id="backHead" title="Chạm để lật lại">
       <div class="w">${esc(w.w)}</div>
       <div class="meta"><div class="p">${esc(w.py)}</div><div class="hv">Hán Việt: ${esc(cap(hvOf(w)))}</div></div>
@@ -729,14 +735,24 @@ const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/
 function renderList(){
   const q = fold($('#q').value.trim());
   const cur = order[pos];
-  const items = W.map((w,i)=>({w,i})).filter(({w})=>inLv(w)).filter(({w})=>!q || w.w.includes($('#q').value.trim()) || fold(w.py).includes(q) || fold(w.vn).includes(q) || fold(w.en).includes(q) || fold(hvOf(w)).includes(q));
+  const items = W.map((w,i)=>({w,i})).filter(({w})=>inLv(w)).sort((a,b)=> merged() ? ((TMAP[a.w.t]-TMAP[b.w.t]) || ((a.w.lv||1)-(b.w.lv||1)) || (a.i-b.i)) : 0).filter(({w})=>!q || w.w.includes($('#q').value.trim()) || fold(w.py).includes(q) || fold(w.vn).includes(q) || fold(w.en).includes(q) || fold(hvOf(w)).includes(q));
   let lastT = -1;
-  $('#list').innerHTML = items.length ? items.map(({w,i})=>{ let h=''; if(w.t!==lastT){ lastT=w.t; h=`<div class="grp">${esc(TOP[w.t])} ${lvTag(w.lv)}</div>`; } return h+`<button class="item${i===cur?' cur':''}" data-i="${i}"><span class="n">${w.n}</span><span class="hz">${w.w}</span><span class="d"><span>${esc(w.py)}</span><em>${esc(w.vn)}</em></span>${known.has(w.n)?'<i class="k" title="Đã thuộc"></i>':'<i></i>'}</button>`; }).join('')
+  $('#list').innerHTML = items.length ? items.map(({w,i})=>{ let h=''; if(tkey(w)!==lastT){ lastT=tkey(w); h=`<div class="grp">${esc(tname(w))}${merged()?'':' '+lvTag(w.lv)}</div>`; } return h+`<button class="item${i===cur?' cur':''}" data-i="${i}"><span class="n">${w.n}</span><span class="hz">${w.w}</span><span class="d"><span>${esc(w.py)}</span><em>${esc(w.vn)}</em></span>${known.has(w.n)?'<i class="k" title="Đã thuộc"></i>':'<i></i>'}</button>`; }).join('')
     : `<div class="empty">Không tìm thấy từ phù hợp. Thử gõ pinyin không dấu, ví dụ “pengyou”.</div>`;
 }
 $('#btnList').onclick = ()=>{ $('#q').value=''; renderList(); openSheet('#sheetList'); setTimeout(()=>{ const c=$('#list .cur'); c && c.scrollIntoView({block:'center'}); },50); };
 $('#q').addEventListener('input', renderList);
 function renderToc(){
+  if(merged()){
+    const cur = order.length ? tkey(W[order[pos]]) : -1;
+    $('#toc').innerHTML = '<div class="tochead">HSK 1 + HSK 2 (gộp theo nhóm)</div>' + MT.map((name,mi)=>{
+      const ws = W.filter(w=>TMAP[w.t]===mi); if(!ws.length) return '';
+      const kn = ws.filter(w=>known.has(w.n)).length, n1 = ws.filter(w=>(w.lv||1)===1).length, n2 = ws.length-n1;
+      const sample = ws.slice(0,6).map(w=>w.w).join(' ');
+      return `<button class="toc-item${mi===cur?' cur':''}" data-m="${mi}"><span class="i">${mi+1}</span><span class="nm">${esc(name)}<small>${sample}${ws.length>6?' …':''}</small><em class="lvc">HSK 1: ${n1} từ · HSK 2: ${n2} từ</em></span><span class="ct">${kn}/${ws.length}<i><span style="width:${kn/ws.length*100}%"></span></i></span></button>`;
+    }).join('');
+    return;
+  }
   const cur = order.length ? W[order[pos]].t : -1;
   let lastL = 0, num = 0;
   $('#toc').innerHTML = TOP.map((name,ti)=>{
@@ -751,10 +767,11 @@ function renderToc(){
 $('#btnToc').onclick = ()=>{ renderToc(); openSheet('#sheetToc'); setTimeout(()=>{ const c=$('#toc .cur'); c && c.scrollIntoView({block:'center'}); },50); };
 $('#toc').addEventListener('click', e=>{
   const b = e.target.closest('.toc-item'); if(!b) return;
-  const ti = +b.dataset.t;
-  let k = order.findIndex(i=>W[i].t===ti);
+  const isM = b.dataset.m!=null; const ti = isM ? +b.dataset.m : +b.dataset.t;
+  const match = i => isM ? TMAP[W[i].t]===ti : W[i].t===ti;
+  let k = order.findIndex(match);
   if(k<0){
-    opts.filter='all'; store.set('opts', opts); buildOrder(null); k = order.findIndex(i=>W[i].t===ti);
+    opts.filter='all'; store.set('opts', opts); buildOrder(null); k = order.findIndex(match);
     toast(opts.filter==='all' ? 'Chủ đề này không còn thẻ trong bộ lọc cũ, đã chuyển sang học tất cả thẻ.' : '');
   }
   pos = k; closeSheets(); stopSpeak(); setFlip(false); render();
@@ -844,7 +861,7 @@ const lvHooks = [];
 $('#lvbar').onclick = e=>{ const b=e.target.closest('button'); if(!b || b.dataset.v===opts.level) return; opts.level=b.dataset.v; store.set('opts',opts); syncLv(); stopSpeak(); pos=0; buildOrder(null); setFlip(false); render(); lvHooks.forEach(f=>{ try{ f(); }catch(err){} }); };
 function jumpToChar(c){ let i = W.findIndex(w=>w.w===c); if(i<0) i = W.findIndex(w=>w.w.includes(c)); if(i<0) return; if(order.indexOf(i)<0){ opts.filter='all'; if(!inLv(W[i])){ opts.level='all'; syncLv(); } store.set('opts',opts); buildOrder(i); } else pos = order.indexOf(i); showTab('cards'); setFlip(true); }
 document.body.dataset.tab = 'cards';
-window.APP = { W, C, R, TOP, STROKES, AUDIO, DLG:DLGS, store, esc, cap, SPK, speak, stopSpeak, toast, showTab, TLV, getKnown:()=>known, level:()=>opts.level, levelWords:()=>W.filter(inLv), inLv, onLevel:f=>lvHooks.push(f), jumpToChar, GROUPS, CIT, pkey, pbtn, rnOf, COMP:DATA.comp||{}, getRate:()=>parseFloat(opts.rate)||1 };
+window.APP = { W, C, R, TOP, STROKES, AUDIO, DLG:DLGS, store, esc, cap, SPK, speak, stopSpeak, toast, showTab, TLV, MT, TMAP, merged, getKnown:()=>known, level:()=>opts.level, levelWords:()=>W.filter(inLv), inLv, onLevel:f=>lvHooks.push(f), jumpToChar, GROUPS, CIT, pkey, pbtn, rnOf, COMP:DATA.comp||{}, getRate:()=>parseFloat(opts.rate)||1 };
 };
 </script>
 <script>window.__quiz = function(){
@@ -980,7 +997,7 @@ function bump(w, ok){ const s = stats[w.n] || [0,0]; s[ok?0:1]++; stats[w.n]=s; 
 function poolFor(){
   const kn = A.getKnown();
   let p = LW().slice();
-  if(cfg.scope==='topics') p = p.filter(w=>cfg.topics.includes(w.t));
+  if(cfg.scope==='topics') p = LV()==='all' ? p.filter(w=>(cfg.topicsM||[]).includes((A.TMAP||[])[w.t])) : p.filter(w=>cfg.topics.includes(w.t));
   else if(cfg.scope==='todo') p = p.filter(w=>!kn.has(w.n));
   else if(cfg.scope==='done') p = p.filter(w=>kn.has(w.n));
   else if(cfg.scope==='weak') p = p.filter(w=>{ const s=stats[w.n]; return s && s[1]>0 && s[1]>=s[0]*0.5; });
@@ -1063,7 +1080,7 @@ function renderSetup(){
       <div class="seg" id="qMode"><button data-v="practice" aria-pressed="${cfg.mode==='practice'}">Luyện tập</button><button data-v="test" aria-pressed="${cfg.mode==='test'}">Kiểm tra</button></div>
       <p class="qhint">${cfg.mode==='practice' ? 'Biết đúng/sai ngay sau mỗi câu, câu sai sẽ được hỏi lại.' : 'Không xem đáp án trong lúc làm, có điểm và phần chữa bài ở cuối.'}</p></div>
     <div class="qsec"><p>Học từ nào</p><div class="chips" id="qScope">${scopes.map(([v,l])=>chip(l, cfg.scope===v, `data-v="${v}"`)).join('')}</div>
-      ${cfg.scope==='topics' ? `<div class="chips topics" id="qTopics">${TOP.map((t,i)=>(LV()==='all' || String((A.TLV||[])[i]||1)===LV()) ? chip(esc(t)+((A.TLV||[])[i]===2?' <small>HSK2</small>':''), cfg.topics.includes(i), `data-t="${i}"`) : '').join('')}</div>` : ''}
+      ${cfg.scope==='topics' ? `<div class="chips topics" id="qTopics">${LV()==='all' ? (A.MT||[]).map((t,mi)=>chip(esc(t), (cfg.topicsM||[]).includes(mi), `data-m="${mi}"`)).join('') : TOP.map((t,i)=>(String((A.TLV||[])[i]||1)===LV()) ? chip(esc(t), cfg.topics.includes(i), `data-t="${i}"`) : '').join('')}</div>` : ''}
       <p class="qhint">${pool.length ? `Có ${pool.length} từ phù hợp.` : (cfg.scope==='topics' ? 'Hãy chọn ít nhất một chủ đề.' : cfg.scope==='weak' ? 'Chưa có từ nào hay sai. Hãy làm vài bài trước nhé.' : 'Chưa có từ nào trong nhóm này.')}</p></div>
     <div class="qsec"><p>Dạng bài <span class="qlink" id="qAllTypes">${cfg.types.length===TYPES.length?'Bỏ chọn hết':'Chọn tất cả'}</span></p>
       <div class="chips" id="qTypes">${TYPES.map(t=>chip(esc(t.name), cfg.types.includes(t.id), `data-v="${t.id}"`)).join('')}</div></div>
@@ -1075,7 +1092,7 @@ function renderSetup(){
   </div>`;
   $('#qMode').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; cfg.mode=b.dataset.v; saveCfg(); renderSetup(); };
   $('#qScope').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; cfg.scope=b.dataset.v; saveCfg(); renderSetup(); };
-  const tp = $('#qTopics'); if(tp) tp.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; const i=+b.dataset.t; cfg.topics = cfg.topics.includes(i) ? cfg.topics.filter(x=>x!==i) : cfg.topics.concat(i); saveCfg(); renderSetup(); };
+  const tp = $('#qTopics'); if(tp) tp.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; if(b.dataset.m!=null){ const m=+b.dataset.m; const a=cfg.topicsM||[]; cfg.topicsM = a.includes(m) ? a.filter(x=>x!==m) : a.concat(m); } else { const i=+b.dataset.t; cfg.topics = cfg.topics.includes(i) ? cfg.topics.filter(x=>x!==i) : cfg.topics.concat(i); } saveCfg(); renderSetup(); };
   $('#qTypes').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; const v=b.dataset.v; cfg.types = cfg.types.includes(v) ? cfg.types.filter(x=>x!==v) : cfg.types.concat(v); saveCfg(); renderSetup(); };
   $('#qAllTypes').onclick = ()=>{ cfg.types = cfg.types.length===TYPES.length ? [] : TYPES.map(t=>t.id); saveCfg(); renderSetup(); };
   $('#qCount').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; cfg.count=+b.dataset.v; saveCfg(); renderSetup(); };
