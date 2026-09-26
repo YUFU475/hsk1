@@ -380,6 +380,25 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .cmpi{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;background:var(--card);border:1px solid var(--gold-soft);text-align:left}
 .cmpi.on{border-color:#3E8E5A}.cmpi span{font-family:var(--hz);font-size:30px;font-weight:700;width:40px;text-align:center}
 .cmpi b{font-size:14px}.cmpi small{display:block;color:var(--muted);font-size:12.5px}
+.hzsw{margin:4px 0 14px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.rtile{border:1px solid var(--gold-soft);background:var(--card);border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.2}
+.rtile .re{font-size:26px}.rtile .rb{font-family:var(--hz);font-size:28px;font-weight:700;color:var(--blue)}
+.rtile .rv{font-family:var(--hz);font-size:15px;color:var(--red);min-height:18px}.rtile .rh{font-size:12px;color:var(--muted)}
+.rhero{display:grid;grid-template-columns:auto auto 1fr;gap:12px;align-items:center;background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:14px;margin:6px 0 12px}
+.remo{font-size:64px;line-height:1}
+.rbase{width:120px;height:120px;border:1.5px solid var(--gold);border-radius:8px;background:linear-gradient(var(--grid),var(--grid)) center/1px 100% no-repeat,linear-gradient(var(--grid),var(--grid)) center/100% 1px no-repeat,var(--paper);cursor:pointer}
+.rmeta{display:flex;flex-direction:column;gap:3px;min-width:0}.rmeta b{font-size:16px;color:var(--red)}.rmeta small{color:var(--muted);font-size:12.5px}
+.rform{background:var(--card);border:1px solid var(--gold-soft);border-radius:14px;padding:10px;margin-bottom:8px}
+.rfh{display:flex;gap:10px;align-items:center}
+.rfg{width:64px;height:64px;flex:none;border:1.5px solid var(--gold);border-radius:8px;background:var(--paper);display:grid;place-items:center}
+.rfg.txt{font-family:var(--hz);font-size:40px;font-weight:700}
+.rfi{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.3}
+.rfi b{font-family:var(--hz);font-size:15px}.rfi b i{font-family:var(--ui);font-style:normal;color:var(--red);font-size:13px}.rfi small{color:var(--muted);font-size:12.5px}
+.rpos{align-self:flex-start;font-size:11px;font-weight:700;color:#fff;background:var(--blue);border-radius:6px;padding:1px 7px}
+.pbtn.sm{padding:6px 10px;font-size:12.5px}
+.rex{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.rex.none{font-size:12.5px;color:var(--muted)}
+.covered .hideable{filter:blur(6px);cursor:pointer;user-select:none}.covered .hideable.shown{filter:none}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -498,14 +517,14 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790430533';
+    const V = '?v=1790431298';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
       DATA=got[0]; STROKES=got[1]; DLGS=got[2];
       (DATA.akeys||[]).forEach(k=>{ if(!(k in AUDIO)) AUDIO[k]=true; });
     }
-    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write();
+    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad();
     if(box) box.remove();
     if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json'] : ['a1.json','ac.json','a2.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
@@ -1490,6 +1509,78 @@ A.startCustomQuiz = (pool)=>{ A.showTab('quiz'); const ts = cfg.types.filter(t=>
 };
 
 </script>
+<script>window.__rad = function(){
+const A = window.APP; if(!A) return;
+const {C, esc, cap, STROKES} = A;
+const FAM = (window.DATA && DATA.radfam) || [];
+const DEC = (window.DATA && DATA.dec) || {};
+const $ = s => document.querySelector(s);
+const root = () => $('#hzv');
+const CIT = A.CIT || {};
+const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
+let cover = A.store.get('radCover', false);
+const MEAT = new Set(Object.keys(C).filter(c=>C[c].rad==='月' && /⺼|thịt|cơ thể/.test(C[c].note)));
+function posOf(c, g){
+  const d = DEC[c]; if(!d) return null; const i = d.indexOf(g, 1); if(i<1) return null;
+  return d[0]==='⿰' ? (i===1?'trái':'phải') : d[0]==='⿱' ? (i===1?'trên':'dưới') : null;
+}
+function examples(fam, f){
+  const g = f.g; const out = [];
+  Object.keys(C).forEach(c=>{
+    if(c===g || !LVc(c)) return;
+    const p = posOf(c, g);
+    const byRad = C[c].rad===g || C[c].sem===g;
+    if(!p && !byRad) return;
+    if(p && !f.pos.includes(p)) return;
+    if(g==='月'){ const meat = MEAT.has(c); if((fam.b==='肉') !== meat) return; }
+    if(g==='阝'){ const side = p || (C[c].side==='L'?'trái':'phải'); if(!f.pos.includes(side)) return; }
+    out.push(c);
+  });
+  return out.slice(0, 16);
+}
+function writerInto(el, g, size){
+  if(!STROKES[g]){ el.textContent = g; el.classList.add('txt'); return null; }
+  const cs = getComputedStyle(document.documentElement);
+  return HanziWriter.create(el, g, {width:size, height:size, padding:6, strokeColor:cs.getPropertyValue('--ink').trim(), outlineColor:cs.getPropertyValue('--gold-soft').trim(), highlightColor:cs.getPropertyValue('--red').trim(), strokeAnimationSpeed:1, delayBetweenStrokes:250, charDataLoader:(ch,d)=>d(STROKES[ch])});
+}
+function list(){
+  root().innerHTML = `<div class="qwrap">${A.hzSwitch ? A.hzSwitch('rad') : ''}
+    <h2 class="qt">Bộ thủ thông dụng</h2>
+    <p class="qhint" style="margin-top:-8px!important">${FAM.length} bộ thủ hay gặp trong HSK 1–2, kèm dạng gốc, dạng biến thể và vị trí trong chữ. Chạm để xem thẻ.</p>
+    <div class="rgrid">${FAM.map((f,i)=>`<button class="rtile" data-i="${i}"><span class="re">${f.emo}</span><span class="rb">${f.b}</span><span class="rv">${[...new Set(f.forms.map(x=>x.g).filter(g=>g!==f.b))].join(' ')||'&nbsp;'}</span><span class="rh">${esc(cap(f.hv))}</span></button>`).join('')}</div></div>`;
+  root().querySelectorAll('.rtile').forEach(b=>b.onclick=()=>card(+b.dataset.i));
+}
+function card(i){
+  A.stopSpeak();
+  const f = FAM[i];
+  const forms = f.forms.map((x,k)=>{ const ex = examples(f, x); return `<div class="rform">
+      <div class="rfh"><div class="rfg" id="rf${k}"></div><div class="rfi"><span class="rpos">${esc(x.pos)}</span><b class="hideable">${esc(x.nz)} <i>${esc(x.npy)}</i></b>${A.pbtn ? A.pbtn(x.g, x.nz, ex.find(c=>posOf(c,x.g)) || null) : ''}<small class="hideable">${esc(x.note)}</small></div><button class="pbtn ghost sm" data-play="${k}">Nét</button></div>
+      ${ex.length?`<div class="rex">${ex.map(c=>`<button class="fchip" data-jc="${c}">${c}</button>`).join('')}</div>`:'<div class="rex none">Chưa có chữ HSK 1–2 dùng dạng này.</div>'}
+    </div>`; }).join('');
+  root().innerHTML = `<div class="qwrap rcard${cover?' covered':''}">
+    <div class="qhead"><button class="qx" id="rBack">←</button><div class="dtitle left">Bộ ${esc(cap(f.hv))}<small>Thẻ ${i+1}/${FAM.length}</small></div><button class="pbtn ghost sm${cover?' on':''}" id="rCover">Tự kiểm tra</button></div>
+    <div class="rhero"><div class="remo">${f.emo}</div><div class="rbase" id="rBase"></div>
+      <div class="rmeta"><b class="hideable">${esc(f.py)} · ${esc(cap(f.hv))}</b>${A.pbtn ? A.pbtn(f.b) : ''}<span class="hideable">${esc(cap(f.vn))}</span><small class="hideable">Hình gốc: ${esc(f.pic)}</small></div></div>
+    ${cover?'<p class="qhint">Đoán tên gọi và nghĩa của bộ, rồi chạm vào vùng mờ để xem đáp án.</p>':''}
+    <div class="qsec"><p>Các cách viết và vị trí trong chữ</p>${forms}</div>
+    <div class="btns"><button id="rPrev" ${i?'':'disabled'}>← Bộ trước</button><button class="pri" id="rNext" ${i<FAM.length-1?'':'disabled'}>Bộ tiếp →</button></div>
+  </div>`;
+  const base = writerInto($('#rBase'), f.b, 120);
+  const ws = f.forms.map((x,k)=>writerInto($('#rf'+k), x.g, 64));
+  if(base) $('#rBase').onclick = ()=>base.animateCharacter();
+  root().querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{ const w = ws[+b.dataset.play]; if(w) w.animateCharacter(); });
+  root().querySelectorAll('.fchip').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.jc));
+  root().querySelectorAll('.hideable').forEach(el=>el.onclick=()=>el.classList.add('shown'));
+  $('#rBack').onclick = ()=>list();
+  $('#rCover').onclick = ()=>{ cover=!cover; A.store.set('radCover', cover); card(i); };
+  $('#rPrev').onclick = ()=>{ card(i-1); root().scrollTop=0; };
+  $('#rNext').onclick = ()=>{ card(i+1); root().scrollTop=0; };
+  root().scrollTop = 0;
+}
+A.radList = list;
+};
+
+</script>
 <script>window.__write = function(){
 const A = window.APP; if(!A) return;
 const {W, C, R, esc, cap, SPK, store, STROKES} = A;
@@ -1837,7 +1928,9 @@ const TYPES = [
   {id:'Tượng hình', short:'Tượng hình', desc:'Vẽ lại hình dáng sự vật, ví dụ 日 mặt trời, 木 cái cây, 人 con người.'},
   {id:'Chỉ sự', short:'Chỉ sự', desc:'Dùng nét hoặc dấu để chỉ ý trừu tượng, ví dụ 上, 下, 一, 二, 三.'}
 ];
-let st = Object.assign({type:'Hình thanh', by:'sem'}, A.store.get('hzView', {}));
+let st = Object.assign({type:'Hình thanh', by:'sem', view:'cls'}, A.store.get('hzView', {}));
+A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="rad" aria-pressed="${v==='rad'}">Bộ thủ thông dụng</button></div>`;
+function wireSw(){ const s = $('#hzSw'); if(s) s.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.view=b.dataset.v; save(); render(); }; }
 const save = ()=>A.store.set('hzView', st);
 
 function info(x){
@@ -1873,6 +1966,7 @@ function practiceBtn(chars){ return `<button class="gprac" data-chars="${chars.j
 
 const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
 function render(){
+  if(st.view==='rad' && A.radList){ A.radList(); wireSw(); return; }
   const all = Object.keys(C).filter(LVc);
   const G = { sem:{}, pho:{} }; Object.entries(GROUPS.sem).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.sem[k]=f; }); Object.entries(GROUPS.pho).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.pho[k]=f; });
   const counts = Object.fromEntries(TYPES.map(t=>[t.id, all.filter(c=>C[c].type===t.id).length]));
@@ -1908,13 +2002,14 @@ function render(){
       body += `<div class="grp2"><div class="hts">${cs.map(c=>tile(c)).join('')}</div><div class="hnotes">${cs.map(c=>`<p><b>${c}</b> ${esc(C[c].note)}</p>`).join('')}</div></div>`;
     }
   }
-  root().innerHTML = `<div class="qwrap">
+  root().innerHTML = `<div class="qwrap">${A.hzSwitch('cls')}
     <h2 class="qt">Phân loại chữ Hán</h2>
     <p class="qhint" style="margin-top:-8px!important">${all.length} chữ ${A.level&&A.level()==='2'?'mới của HSK 2':A.level&&A.level()==='1'?'của HSK 1':'của HSK 1 và HSK 2'}, chia theo cách cấu tạo. Chạm vào chữ để mở thẻ.</p>
     <div class="tgrid">${TYPES.map(t=>`<button class="tcard${t.id===st.type?' on':''}" data-t="${t.id}"><b>${t.short}</b><span>${counts[t.id]} chữ</span></button>`).join('')}</div>
     <p class="tdesc">${esc(T.desc)}</p>
     ${body}
   </div>`;
+  wireSw();
   root().querySelectorAll('.tcard').forEach(b=>b.onclick=()=>{ st.type=b.dataset.t; save(); render(); root().scrollTop=0; });
   const by = $('#hzBy'); if(by) by.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.by=b.dataset.v; save(); render(); };
   root().querySelectorAll('.ht').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.c));
