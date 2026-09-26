@@ -353,6 +353,28 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .h2d{font-size:9.5px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;padding:0 4px;margin-top:2px}
 .chip small{font-size:10px;color:var(--red);font-weight:700}
 .lvc{display:block;font-style:normal;font-size:11.5px;color:var(--red);font-weight:600;margin-top:1px}
+.songbtn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:1.5px solid var(--red);background:var(--red-soft);border-radius:14px;padding:12px 14px;margin:0 0 18px;cursor:pointer;color:var(--ink)}
+.songbtn span{font-size:26px}.songbtn b{display:block;font-size:15.5px;color:var(--red)}.songbtn small{color:var(--muted);font-size:12.5px}
+.dlist.one{grid-template-columns:1fr}
+.flab{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:10px 0 6px}
+.lyr{font-family:var(--hz);font-size:17px;font-weight:500;letter-spacing:0}
+.lyrics{background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:14px 12px;line-height:2.1}
+.lyl{font-family:var(--hz);font-size:20px;min-height:1em;margin:2px 0}
+.lyl.empty{height:12px}
+.lyt{color:var(--ink)}
+.lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
+.lyw.l1{color:var(--blue);border-color:var(--blue)} .lyw.l2{color:var(--red);border-color:var(--red)}
+.lyw ruby rt{font-family:var(--ui);font-size:10.5px;font-weight:600;letter-spacing:0}
+.lylg{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.lylg i{display:inline-block;width:10px;height:10px;border-radius:3px}.lylg i.l1{background:var(--blue)}.lylg i.l2{background:var(--red);margin-left:6px}
+.lysub{font-size:12.5px;font-weight:700;color:var(--muted);margin:10px 0 6px}
+.lychips{display:flex;flex-wrap:wrap;gap:6px}
+.chipw{font-family:var(--hz);font-size:17px;border:1.5px solid;border-radius:10px;padding:3px 8px;background:var(--card)}
+.chipw small{font-family:var(--ui);font-size:10.5px;margin-left:3px;color:var(--muted)}
+.sw{padding:6px 0 14px;border-bottom:1px dashed var(--gold-soft);margin-bottom:10px}
+.swh{display:flex;align-items:center;gap:8px}.swz{font-family:var(--hz);font-weight:700;font-size:34px;color:var(--blue)}
+.swh .spk{margin-left:auto}
+.swp{color:var(--red);font-weight:600;margin-top:2px}.swv{font-weight:700;font-size:16px;margin-top:4px}.swe{color:var(--muted);font-size:13px;margin-bottom:8px}
 .empty{padding:40px 10px;text-align:center;color:var(--muted);font-size:14px}
 @media (max-height:640px){.front .tile{--ts:84px}}
 @media (prefers-reduced-motion:reduce){.card,.sheet,.scrim,.bar i{transition:none}}
@@ -456,14 +478,14 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790409366';
+    const V = '?v=1790417195';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
       DATA=got[0]; STROKES=got[1]; DLGS=got[2];
       (DATA.akeys||[]).forEach(k=>{ if(!(k in AUDIO)) AUDIO[k]=true; });
     }
-    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz();
+    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs();
     if(box) box.remove();
     if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json'] : ['a1.json','ac.json','a2.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
@@ -1076,6 +1098,7 @@ function renderSetup(){
   root().innerHTML = `
   <div class="qwrap">
     <h2 class="qt">Bài tập và kiểm tra</h2>
+    <button class="songbtn" id="qSongs"><span>🎵</span><div><b>Học qua bài hát</b><small>Dán lời bài hát, trang tự tô màu từ HSK 1 và HSK 2</small></div></button>
     <div class="qsec"><p>Chế độ</p>
       <div class="seg" id="qMode"><button data-v="practice" aria-pressed="${cfg.mode==='practice'}">Luyện tập</button><button data-v="test" aria-pressed="${cfg.mode==='test'}">Kiểm tra</button></div>
       <p class="qhint">${cfg.mode==='practice' ? 'Biết đúng/sai ngay sau mỗi câu, câu sai sẽ được hỏi lại.' : 'Không xem đáp án trong lúc làm, có điểm và phần chữa bài ở cuối.'}</p></div>
@@ -1097,6 +1120,7 @@ function renderSetup(){
   $('#qAllTypes').onclick = ()=>{ cfg.types = cfg.types.length===TYPES.length ? [] : TYPES.map(t=>t.id); saveCfg(); renderSetup(); };
   $('#qCount').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; cfg.count=+b.dataset.v; saveCfg(); renderSetup(); };
   $('#qStart').onclick = ()=>start(poolFor(), cfg.types);
+  $('#qSongs').onclick = ()=>A.openSongs && A.openSongs();
   root().querySelectorAll('.ditem').forEach(b=>b.onclick=()=>renderReader(DLG_ALL[+b.dataset.d]));
 }
 
@@ -1436,8 +1460,122 @@ function finish(){
 }
 
 A.onQuizTab = ()=>{ if(!S) renderSetup(); };
+A.quizHome = ()=>{ S=null; renderSetup(); };
 if(A.onLevel) A.onLevel(()=>{ if(document.body.dataset.tab==='quiz'){ S=null; renderSetup(); } });
 A.startCustomQuiz = (pool)=>{ A.showTab('quiz'); const ts = cfg.types.filter(t=>!DTYPES.has(t)); start(pool, ts.length?ts:TYPES.filter(t=>!t.d).map(t=>t.id), Math.min(20, Math.max(8, pool.length*2)), 'practice'); };
+};
+
+</script>
+<script>window.__songs = function(){
+const A = window.APP; if(!A) return;
+const {W, C, esc, cap, SPK, store} = A;
+const $ = s => document.querySelector(s);
+const root = () => $('#quiz');
+const DICT = {}; W.forEach(w=>{ (DICT[w.w] = DICT[w.w] || []).push(w); });
+const MAXL = Math.max(...Object.keys(DICT).map(k=>[...k].length));
+const DEFAULTS = [
+  {id:'s1', title:'青花瓷', artist:'Châu Kiệt Luân (周杰伦)', vn:'Sứ Thanh Hoa', text:''},
+  {id:'s2', title:'Cỏ dại và hoa dành dành', artist:'', vn:'', text:''}
+];
+let songs = store.get('songs', null) || DEFAULTS.map(s=>({...s}));
+const save = ()=>store.set('songs', songs);
+let showPy = store.get('songPy', true);
+
+function segment(line){
+  const ch = [...line]; const out = []; let i = 0;
+  while(i<ch.length){
+    let hit = null;
+    for(let L=Math.min(MAXL, ch.length-i); L>=1; L--){ const s = ch.slice(i,i+L).join(''); if(DICT[s]){ hit = s; break; } }
+    if(hit){ out.push({w:hit}); i += [...hit].length; }
+    else { const last = out[out.length-1]; if(last && last.t!=null) last.t += ch[i]; else out.push({t:ch[i]}); i++; }
+  }
+  return out;
+}
+function lvOf(word){ const ws = DICT[word]; return Math.min(...ws.map(w=>w.lv||1)); }
+
+function sheet(){
+  let s = $('#sheetSong');
+  if(!s){ s = document.createElement('div'); s.className='sheet'; s.id='sheetSong'; s.setAttribute('role','dialog'); document.body.appendChild(s);
+    $('#scrim').addEventListener('click', ()=>s.classList.remove('open')); }
+  return s;
+}
+function showWord(word){
+  const ws = DICT[word]; const s = sheet();
+  s.innerHTML = `<div class="grab"></div>${ws.map(w=>`
+    <div class="sw"><div class="swh"><span class="swz">${esc(w.w)}</span><span class="lvb l${w.lv||1}">HSK ${w.lv||1}</span>${AUDIOok(w)?`<button class="spk" data-audio="w${w.n}" aria-label="Nghe">${SPK}</button>`:''}</div>
+    <div class="swp">${esc(w.py)} · Hán Việt: ${esc(cap([...w.w].map(c=>C[c]?C[c].hv:'').join(' ')))}</div>
+    <div class="swv">${esc(cap(w.vn))}</div><div class="swe">${esc(w.en)}</div>
+    <button class="row-btn" data-open="${w.n}">Mở thẻ của từ này</button></div>`).join('')}`;
+  s.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ s.classList.remove('open'); $('#scrim').classList.remove('open'); const w = W.find(x=>x.n===+b.dataset.open); if(w) A.jumpToChar(w.w); });
+  $('#scrim').classList.add('open'); s.classList.add('open');
+}
+function AUDIOok(w){ return !!(A.AUDIO && A.AUDIO['w'+w.n]); }
+
+function renderList(){
+  A.stopSpeak();
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="sgBack" aria-label="Quay lại">←</button><div class="dtitle left">Học qua bài hát<small>Tô màu từ HSK 1 và HSK 2 trong lời bài hát</small></div></div>
+    <p class="qhint" style="margin:0 0 12px!important">Dán lời bài hát tiếng Trung (lấy từ trang lời bài hát hoặc ứng dụng nghe nhạc). Lời chỉ lưu trên máy của bạn.</p>
+    <div class="dlist one">${songs.map(s=>{ const n = s.text ? new Set(s.text.split('\n').flatMap(l=>segment(l).filter(x=>x.w).map(x=>x.w))).size : 0;
+      return `<button class="ditem" data-s="${s.id}"><span class="dk">${s.text ? n+' từ HSK' : 'Chưa có lời, chạm để dán lời'}</span><b>${esc(s.title)}</b><small>${esc([s.vn, s.artist].filter(Boolean).join(' – '))}</small></button>`; }).join('')}</div>
+    <button class="qstart" id="sgAdd" style="margin-top:14px">+ Thêm bài hát</button>
+  </div>`;
+  $('#sgBack').onclick = ()=>A.quizHome();
+  root().querySelectorAll('.ditem[data-s]').forEach(b=>b.onclick=()=>{ const s = songs.find(x=>x.id===b.dataset.s); s.text ? renderSong(s) : renderEdit(s); });
+  $('#sgAdd').onclick = ()=>{ const s = {id:'s'+Date.now(), title:'', artist:'', vn:'', text:''}; renderEdit(s, true); };
+  root().scrollTop = 0;
+}
+function renderEdit(s, isNew){
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="sgBack" aria-label="Quay lại">←</button><div class="dtitle left">${isNew?'Thêm bài hát':'Sửa bài hát'}</div></div>
+    <label class="flab">Tên bài hát</label><input class="search" id="sgT" value="${esc(s.title)}" placeholder="Ví dụ: 青花瓷">
+    <label class="flab">Tên tiếng Việt (không bắt buộc)</label><input class="search" id="sgV" value="${esc(s.vn||'')}" placeholder="Ví dụ: Sứ Thanh Hoa">
+    <label class="flab">Ca sĩ (không bắt buộc)</label><input class="search" id="sgA" value="${esc(s.artist||'')}">
+    <label class="flab">Lời bài hát tiếng Trung</label><textarea class="codebox lyr" id="sgX" rows="12" placeholder="Dán lời bài hát vào đây, mỗi câu một dòng…">${esc(s.text||'')}</textarea>
+    <div class="btns"><button class="pri" id="sgSave">Lưu</button>${isNew?'':'<button id="sgDel">Xoá bài</button>'}</div>
+  </div>`;
+  $('#sgBack').onclick = ()=>renderList();
+  $('#sgSave').onclick = ()=>{
+    s.title = $('#sgT').value.trim() || 'Bài hát chưa đặt tên'; s.vn = $('#sgV').value.trim(); s.artist = $('#sgA').value.trim();
+    s.text = $('#sgX').value.replace(/\r/g,'').trim();
+    if(isNew) songs.push(s); save();
+    s.text ? renderSong(s) : renderList();
+  };
+  const del = $('#sgDel'); if(del) del.onclick = ()=>{ if(confirm('Xoá bài hát này khỏi máy?')){ songs = songs.filter(x=>x.id!==s.id); save(); renderList(); } };
+}
+function renderSong(s){
+  A.stopSpeak();
+  const lines = s.text.split('\n');
+  const found = {};
+  const html = lines.map(l=>{
+    if(!l.trim()) return '<div class="lyl empty"></div>';
+    return `<div class="lyl">${segment(l).map(x=>{
+      if(x.t!=null) return `<span class="lyt">${esc(x.t)}</span>`;
+      found[x.w] = (found[x.w]||0)+1; const lv = lvOf(x.w); const py = DICT[x.w][0].py;
+      return `<button class="lyw l${lv}" data-w="${esc(x.w)}">${showPy?`<ruby>${esc(x.w)}<rt>${esc(py)}</rt></ruby>`:esc(x.w)}</button>`;
+    }).join('')}</div>`;
+  }).join('');
+  const words = Object.keys(found);
+  const w1 = words.filter(w=>lvOf(w)===1), w2 = words.filter(w=>lvOf(w)===2);
+  const chips = ws => ws.map(w=>`<button class="lyw l${lvOf(w)} chipw" data-w="${esc(w)}">${esc(w)}<small>×${found[w]}</small></button>`).join('');
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="sgBack" aria-label="Quay lại">←</button><div class="dtitle left">${esc(s.title)}<small>${esc([s.vn, s.artist].filter(Boolean).join(' – '))}</small></div><button class="qx" id="sgEdit" aria-label="Sửa">✎</button></div>
+    <div class="dctl"><button class="pbtn ghost${showPy?' on':''}" id="sgPy">Pinyin</button><span class="lylg"><i class="l1"></i>HSK 1 <i class="l2"></i>HSK 2</span></div>
+    <div class="lyrics">${html}</div>
+    <div class="qsec" style="margin-top:18px"><p>Từ HSK trong bài (${words.length})</p>
+      ${w1.length?`<div class="lysub">HSK 1 – ${w1.length} từ</div><div class="lychips">${chips(w1)}</div>`:''}
+      ${w2.length?`<div class="lysub">HSK 2 – ${w2.length} từ</div><div class="lychips">${chips(w2)}</div>`:''}
+      ${words.length?'<button class="qstart" id="sgPractice" style="margin-top:12px">Luyện các từ này</button>':'<p class="qhint">Chưa tìm thấy từ HSK 1–2 nào.</p>'}
+    </div>
+  </div>`;
+  $('#sgBack').onclick = ()=>renderList();
+  $('#sgEdit').onclick = ()=>renderEdit(s);
+  $('#sgPy').onclick = ()=>{ showPy = !showPy; store.set('songPy', showPy); renderSong(s); };
+  root().querySelectorAll('.lyw').forEach(b=>b.onclick=()=>showWord(b.dataset.w));
+  const pr = $('#sgPractice'); if(pr) pr.onclick = ()=>{ const set = new Set(words); A.startCustomQuiz(W.filter(w=>set.has(w.w))); };
+  root().scrollTop = 0;
+}
+A.openSongs = ()=>{ A.showTab('quiz'); renderList(); };
 };
 
 </script>
