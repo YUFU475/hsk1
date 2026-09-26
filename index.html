@@ -191,6 +191,7 @@ body:not([data-tab="cards"]) .stage,body:not([data-tab="cards"]) .bottom,body:no
 body:not([data-tab="quiz"]) .quiz{display:none}
 body:not([data-tab="hz"]) #hzv{display:none}
 body:not([data-tab="rad"]) #radv{display:none}
+body:not([data-tab="pro"]) #prov{display:none}
 .quiz,.hzv{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:0 -14px;padding:0 14px 24px}
 .qwrap{padding-top:4px}
 .qt{font-size:20px;margin:6px 0 14px}
@@ -415,6 +416,19 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .lvrow{display:flex;gap:6px;align-items:center;padding:0 0 10px}
 .lvrow .lvbar{flex:1;padding:0}
 .icon-btn.sm{width:36px;height:36px;border-radius:10px}.icon-btn.sm svg{width:18px;height:18px}
+.tabs button{flex:1 1 auto;font-size:12.5px;padding:9px 3px}
+.icon-btn.txt{width:auto;padding:0 10px;gap:5px;display:inline-flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--ink)}
+.lvbar button{padding:7px 2px}
+.pzh{font-style:normal;font-family:var(--hz);font-weight:600;color:var(--muted);font-size:14px}
+.songbtn small.pct{display:block;color:var(--blue);font-weight:600;margin-top:2px}
+.plist{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--gold-soft);border-radius:12px;padding:8px 10px}
+.phz{font-family:var(--hz);font-size:22px;font-weight:700;min-width:84px}
+.pinf{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}.pinf b{color:var(--red);font-size:13.5px}.pinf span{font-size:13.5px}
+.psent2{display:flex;gap:8px;align-items:flex-start;background:var(--card);border:1px solid var(--gold-soft);border-radius:12px;padding:10px;margin-bottom:6px}
+.pst{flex:1;min-width:0}.pzh2{font-family:var(--hz);font-size:19px;line-height:1.5}.pzh2 mark{background:none;color:var(--red);font-weight:700}
+.progress .icon-btn{flex:none}
+.progress{gap:8px}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -439,20 +453,16 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 <div id="boot" class="boot"><div class="bspin"></div><p>Đang tải bộ thẻ…</p></div>
 <div class="app">
   <header class="top">
-    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true">Thẻ từ</button><button id="tabHz" role="tab" aria-selected="false">Chữ Hán</button><button id="tabRad" role="tab" aria-selected="false">Bộ thủ</button><button id="tabQuiz" role="tab" aria-selected="false">Bài tập</button></div>
+    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true">Thẻ từ</button><button id="tabHz" role="tab" aria-selected="false">Chữ Hán</button><button id="tabRad" role="tab" aria-selected="false">Bộ thủ</button><button id="tabPro" role="tab" aria-selected="false">Chuyên ngành</button><button id="tabQuiz" role="tab" aria-selected="false">Bài tập</button></div>
   </header>
   <div class="lvrow"><div class="lvbar" id="lvbar"><button data-v="1">HSK 1</button><button data-v="2">HSK 2</button><button data-v="all">Cả hai</button></div>
-    <button class="icon-btn sm" id="btnToc" aria-label="Mục lục chủ đề" title="Mục lục">
-      <svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg>
-    </button>
-    <button class="icon-btn sm" id="btnList" aria-label="Danh sách từ" title="Danh sách">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    </button>
     <button class="icon-btn sm" id="btnSet" aria-label="Tuỳ chọn" title="Tuỳ chọn">
       <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
     </button>
   </div>
-  <div class="progress"><div class="bar"><i id="bar"></i></div><span class="counter" id="counter"></span></div>
+  <div class="progress"><button class="icon-btn sm txt" id="btnToc" aria-label="Mục lục chủ đề"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>Mục lục</span></button><button class="icon-btn sm" id="btnList" aria-label="Danh sách từ" title="Danh sách">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button><div class="bar"><i id="bar"></i></div><span class="counter" id="counter"></span></div>
 
   <main class="stage" id="stage">
     <div class="card" id="card">
@@ -474,6 +484,7 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
   <main class="quiz" id="quiz" aria-live="polite"></main>
   <main class="hzv" id="hzv"></main>
   <main class="hzv radv" id="radv"></main>
+  <main class="hzv" id="prov"></main>
 </div>
 
 <div class="toast" id="toast" role="status"></div>
@@ -535,16 +546,16 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790433007';
+    const V = '?v=1790435559';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
       DATA=got[0]; STROKES=got[1]; DLGS=got[2];
       (DATA.akeys||[]).forEach(k=>{ if(!(k in AUDIO)) AUDIO[k]=true; });
     }
-    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad();
+    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad(); if(window.__pro) window.__pro();
     if(box) box.remove();
-    if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json'] : ['a1.json','ac.json','a2.json'];
+    if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json','ap.json'] : ['a1.json','ac.json','a2.json','ap.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
   }catch(e){ if(box) box.innerHTML = '<p>Không tải được dữ liệu. Bạn kiểm tra mạng rồi tải lại trang nhé.</p>'; }
 }
@@ -925,10 +936,11 @@ render();
 setTimeout(checkHash, 300);
 function showTab(t){
   document.body.dataset.tab = t;
-  $('#tabCards').setAttribute('aria-selected', t==='cards'); $('#tabQuiz').setAttribute('aria-selected', t==='quiz'); $('#tabHz').setAttribute('aria-selected', t==='hz'); $('#tabRad').setAttribute('aria-selected', t==='rad');
+  $('#tabCards').setAttribute('aria-selected', t==='cards'); $('#tabQuiz').setAttribute('aria-selected', t==='quiz'); $('#tabHz').setAttribute('aria-selected', t==='hz'); $('#tabRad').setAttribute('aria-selected', t==='rad'); $('#tabPro').setAttribute('aria-selected', t==='pro');
   stopSpeak();
   if(t==='quiz'){ setFlip(false); window.APP.onQuizTab && window.APP.onQuizTab(); }
   else if(t==='hz'){ setFlip(false); window.APP.onHzTab && window.APP.onHzTab(); }
+  else if(t==='pro'){ setFlip(false); window.APP.onProTab && window.APP.onProTab(); }
   else if(t==='rad'){ setFlip(false); window.APP.onRadTab && window.APP.onRadTab(); }
   else { render(); }
 }
@@ -936,6 +948,7 @@ $('#tabCards').onclick = ()=>showTab('cards');
 $('#tabQuiz').onclick = ()=>showTab('quiz');
 $('#tabHz').onclick = ()=>showTab('hz');
 $('#tabRad').onclick = ()=>showTab('rad');
+$('#tabPro').onclick = ()=>showTab('pro');
 function syncLv(){ $('#lvbar').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===opts.level)); }
 syncLv();
 const lvHooks = [];
@@ -1526,6 +1539,99 @@ A.onQuizTab = ()=>{ if(!S) renderSetup(); };
 A.quizHome = ()=>{ S=null; renderSetup(); };
 if(A.onLevel) A.onLevel(()=>{ if(document.body.dataset.tab==='quiz'){ S=null; renderSetup(); } });
 A.startCustomQuiz = (pool)=>{ A.showTab('quiz'); const ts = cfg.types.filter(t=>!DTYPES.has(t)); start(pool, ts.length?ts:TYPES.filter(t=>!t.d).map(t=>t.id), Math.min(20, Math.max(8, pool.length*2)), 'practice'); };
+};
+
+</script>
+<script>window.__pro = function(){
+const A = window.APP; if(!A) return;
+const {W, esc, cap, SPK} = A;
+const PRO = (window.DATA && DATA.pro) || [];
+const $ = s => document.querySelector(s);
+const root = () => $('#prov');
+const rnd = n => Math.floor(Math.random()*n);
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const HSK = {}; W.forEach(w=>{ if(!HSK[w.w]) HSK[w.w]=w.lv||1; });
+const spk = k => A.AUDIO && A.AUDIO[k] ? `<button class="spk sm" data-audio="${k}" aria-label="Nghe">${SPK}</button>` : '';
+let cur = null, view = 'words';
+function home(){
+  A.stopSpeak();
+  root().innerHTML = `<div class="qwrap"><h2 class="qt">Học theo chuyên ngành</h2>
+    <p class="qhint" style="margin-top:-8px!important">Từ vựng chuyên ngành và mẫu câu thường gặp trong công việc, kèm phát âm và bài luyện tập.</p>
+    ${PRO.map((d,i)=>`<button class="songbtn" data-i="${i}"><span>${d.emo}</span><div><b>${esc(d.vn)} <em class="pzh">${esc(d.zh)}</em></b><small>${esc(d.desc)}</small><small class="pct">${d.words.length} từ vựng · ${d.sents.length} mẫu câu</small></div></button>`).join('')}</div>`;
+  root().querySelectorAll('.songbtn').forEach(b=>b.onclick=()=>{ cur = PRO[+b.dataset.i]; view='words'; domain(); });
+  root().scrollTop = 0;
+}
+function hl(zh){
+  const ws = cur.words.map(w=>w.w).sort((a,b)=>b.length-a.length);
+  let out = ''; let i = 0; const ch = [...zh];
+  while(i<ch.length){ let hit=null; for(const w of ws){ if(ch.slice(i,i+[...w].length).join('')===w){ hit=w; break; } }
+    if(hit){ out += `<mark>${esc(hit)}</mark>`; i += [...hit].length; } else { out += esc(ch[i]); i++; } }
+  return out;
+}
+function domain(){
+  A.stopSpeak();
+  const d = cur;
+  let body = '';
+  if(view==='words'){
+    body = `<div class="plist">${d.words.map(w=>`<div class="prow"><span class="phz">${esc(w.w)}</span><div class="pinf"><b>${esc(w.py)}</b><span>${esc(cap(w.vn))}</span></div>${HSK[w.w]?`<span class="lvb l${HSK[w.w]}">HSK ${HSK[w.w]}</span>`:''}${spk(w.k)}</div>`).join('')}</div>`;
+  } else if(view==='sents'){
+    const groups = []; d.sents.forEach(s=>{ let g = groups.find(x=>x.g===s.g); if(!g){ g={g:s.g, list:[]}; groups.push(g); } g.list.push(s); });
+    body = groups.map(g=>`<div class="lysub">${esc(g.g)}</div>${g.list.map(s=>`<div class="psent2"><div class="pst"><div class="pzh2">${hl(s.zh)}</div><div class="dpy">${esc(s.py)}</div><div class="dvn">${esc(s.vn)}</div></div>${spk(s.k)}</div>`).join('')}`).join('');
+  } else { body = ''; }
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="pBack">←</button><div class="dtitle left">${d.emo} ${esc(d.vn)}<small>${esc(d.zh)}</small></div></div>
+    <div class="seg" id="pSeg"><button data-v="words" aria-pressed="${view==='words'}">Từ vựng (${d.words.length})</button><button data-v="sents" aria-pressed="${view==='sents'}">Mẫu câu (${d.sents.length})</button><button data-v="quiz" aria-pressed="${view==='quiz'}">Luyện tập</button></div>
+    <div id="pBody" style="margin-top:12px">${body}</div></div>`;
+  $('#pBack').onclick = home;
+  $('#pSeg').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; view=b.dataset.v; if(view==='quiz') startQuiz(); else domain(); };
+  root().scrollTop = 0;
+}
+let Q = null;
+function startQuiz(){
+  const d = cur; const qs = [];
+  const types = ['hz2vn','vn2hz','listen','fill'];
+  const words = shuffle(d.words);
+  for(let i=0;i<10;i++){
+    const t = types[i%types.length]; const w = words[i%words.length];
+    if(t==='fill'){ const ss = d.sents.filter(s=>d.words.some(x=>s.zh.includes(x.w))); const s = ss[rnd(ss.length)]; const cand = d.words.filter(x=>s.zh.includes(x.w)).sort((a,b)=>b.w.length-a.w.length); qs.push({t, w:cand[0], s}); }
+    else qs.push({t, w});
+  }
+  Q = {qs, i:0, ok:0}; qView();
+}
+function qView(){
+  A.stopSpeak();
+  const q = Q.qs[Q.i]; if(!q){ qEnd(); return; }
+  const w = q.w; const others = shuffle(cur.words.filter(x=>x!==w && x.vn!==w.vn)).slice(0,3);
+  let prompt, opts, correct, hz=false;
+  if(q.t==='hz2vn'){ prompt = `<div class="pz">${esc(w.w)}</div><div class="pp">${esc(w.py)}</div><p class="pq">Nghĩa của từ này là gì?</p>`; correct=cap(w.vn); opts=[correct].concat(others.map(x=>cap(x.vn))); }
+  else if(q.t==='vn2hz'){ prompt = `<div class="pv">${esc(cap(w.vn))}</div><p class="pq">Chọn từ tiếng Trung đúng</p>`; correct=w.w; opts=[correct].concat(others.map(x=>x.w)); hz=true; }
+  else if(q.t==='listen'){ prompt = `<div class="plisten">${spk(w.k).replace('spk sm','spk')}<span>Bấm loa để nghe</span></div><p class="pq">Bạn nghe thấy từ nào?</p>`; correct=w.w; opts=[correct].concat(others.map(x=>x.w)); hz=true; }
+  else { const s=q.s; prompt = `<div class="psent">${esc(s.zh).replace(esc(w.w),'<span class="blank">？</span>')}</div><div class="pe">${esc(s.vn)}</div><p class="pq">Chọn từ điền vào chỗ trống</p>`; correct=w.w; opts=[correct].concat(shuffle(cur.words.filter(x=>x!==w && !s.zh.includes(x.w))).slice(0,3).map(x=>x.w)); hz=true; }
+  opts = shuffle(opts);
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="pqQuit">✕</button><div class="qbar"><i style="width:${Q.i/Q.qs.length*100}%"></i></div><span class="qcnt">${Q.i+1}/${Q.qs.length}</span></div>
+    <div class="qtype">${esc(cur.vn)} <span>Đúng ${Q.ok}/${Q.i}</span></div>
+    <div class="qbody">${prompt}<div class="opts${hz?' hz':''}">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</div></div><div id="pqFb"></div></div>`;
+  $('#pqQuit').onclick = ()=>{ view='words'; domain(); };
+  if(q.t==='listen'){ const b = root().querySelector('.plisten .spk'); if(b) setTimeout(()=>A.speak(w.k, b, true), 150); }
+  root().querySelectorAll('.opt[data-i]').forEach(b=>b.onclick=()=>{
+    const ok = opts[+b.dataset.i]===correct; if(ok) Q.ok++;
+    root().querySelectorAll('.opt[data-i]').forEach(o=>{ o.disabled=true; if(opts[+o.dataset.i]===correct) o.classList.add('ok'); });
+    if(!ok) b.classList.add('bad');
+    const s = q.s;
+    $('#pqFb').innerHTML = `<div class="fb ${ok?'good':'nope'}"><b>${ok?'Chính xác!':'Chưa đúng'}</b><div class="ans"><span class="ah">${esc(w.w)}</span><span class="ap">${esc(w.py)}</span><span class="av">${esc(cap(w.vn))}</span>${spk(w.k)}</div>${s?`<div class="fbx">${esc(s.zh)}<small>${esc(s.py)}</small></div>`:''}<button class="qstart" id="pqNext">${Q.i+1<Q.qs.length?'Câu tiếp theo':'Xem kết quả'}</button></div>`;
+    $('#pqNext').onclick = ()=>{ Q.i++; qView(); root().scrollTop=0; };
+    const sb = $('#pqFb .spk'); if(sb) setTimeout(()=>A.speak(w.k, sb, true), 120);
+  });
+}
+function qEnd(){
+  const n = Q.qs.length;
+  root().innerHTML = `<div class="qwrap"><div class="score"><div class="ring" style="--p:${Math.round(Q.ok/n*100)}"><span>${Q.ok}/${n}</span></div><div><b>${esc(cur.vn)}</b><p>${Q.ok===n?'Xuất sắc! 太棒了！':'Luyện thêm vài lượt để nhớ chắc hơn nhé. 加油！'}</p></div></div>
+    <div class="btns col"><button class="pri" id="pqAgain">Làm lượt mới</button><button id="pqWords">Xem lại từ vựng</button></div></div>`;
+  $('#pqAgain').onclick = startQuiz;
+  $('#pqWords').onclick = ()=>{ view='words'; domain(); };
+}
+A.onProTab = ()=>{ if(!cur) home(); };
 };
 
 </script>
