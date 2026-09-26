@@ -399,6 +399,16 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .pbtn.sm{padding:6px 10px;font-size:12.5px}
 .rex{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.rex.none{font-size:12.5px;color:var(--muted)}
 .covered .hideable{filter:blur(6px);cursor:pointer;user-select:none}.covered .hideable.shown{filter:none}
+.hzsw button{font-size:12.5px;padding:9px 2px}
+.kxg{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px;margin-bottom:6px}
+.kxt{position:relative;border:1px solid var(--gold-soft);background:var(--card);border-radius:12px;padding:6px 2px 5px;display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.15}
+.kxt .kn{position:absolute;top:3px;left:5px;font-size:9.5px;color:var(--muted)}
+.kxt .kg{font-family:var(--hz);font-size:26px;font-weight:700;color:var(--blue)}
+.kxt .kv{font-family:var(--hz);font-size:13px;color:var(--red);min-height:15px}
+.kxt .kh{font-size:11.5px;color:var(--muted)}
+.kvars{display:flex;flex-wrap:wrap;gap:10px}
+.kvar{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--hz);font-size:15px;color:var(--red)}
+.kvar .rfg{cursor:pointer}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -517,7 +527,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790431298';
+    const V = '?v=1790432462';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -1578,6 +1588,60 @@ function card(i){
   root().scrollTop = 0;
 }
 A.radList = list;
+
+const KX = (window.DATA && DATA.kangxi) || [];
+let kq = '';
+const fold = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
+function kxExamples(k){
+  const forms = [k.g].concat(k.v); const out = [];
+  Object.keys(C).forEach(c=>{
+    if(forms.includes(c) || !LVc(c)) return;
+    const d = DEC[c];
+    if(forms.includes(C[c].rad) || forms.includes(C[c].sem) || (d && forms.some(f=>d.indexOf(f,1)>0))){
+      if(k.g==='月' && MEAT.has(c)) return; if(k.g==='肉' && C[c].rad==='月' && !MEAT.has(c)) return;
+      if(k.g==='邑' && (C[c].side==='L' || posOf(c,'阝')==='trái')) return;
+      if(k.g==='阜' && (C[c].side==='R' || posOf(c,'阝')==='phải')) return;
+      out.push(c);
+    }
+  });
+  return out.slice(0,24);
+}
+function famIndex(k){ return FAM.findIndex(f=>f.b===k.g || k.v.includes(f.b)); }
+function all(){
+  const q = fold(kq);
+  const items = KX.filter(k=>!q || fold(k.hv).includes(q) || fold(k.py).includes(q) || fold(k.vn).includes(q) || k.g===kq || k.v.includes(kq) || String(k.n)===kq);
+  const groups = {}; items.forEach(k=>{ (groups[k.s]=groups[k.s]||[]).push(k); });
+  root().innerHTML = `<div class="qwrap">${A.hzSwitch ? A.hzSwitch('all') : ''}
+    <h2 class="qt">214 bộ thủ</h2>
+    <p class="qhint" style="margin-top:-8px!important">Bộ thủ Khang Hy, xếp theo số nét. Dạng biến thể màu đỏ. Chạm vào bộ để xem thẻ.</p>
+    <input class="search" id="kxQ" type="search" placeholder="Tìm theo Hán Việt, pinyin, nghĩa hoặc số thứ tự…" value="${esc(kq)}">
+    ${Object.keys(groups).map(s=>`<div class="grp" style="position:static">${s} nét</div><div class="kxg">${groups[s].map(k=>`<button class="kxt" data-n="${k.n}"><span class="kn">${k.n}</span><span class="kg">${k.g}</span><span class="kv">${k.v.join(' ')||'&nbsp;'}</span><span class="kh">${esc(cap(k.hv))}</span></button>`).join('')}</div>`).join('') || '<div class="empty">Không tìm thấy bộ phù hợp.</div>'}
+  </div>`;
+  const inp = $('#kxQ'); inp.oninput = ()=>{ kq = inp.value.trim(); const pos = inp.selectionStart; all(); const i2 = $('#kxQ'); i2.focus(); try{ i2.setSelectionRange(pos,pos); }catch(e){} };
+  root().querySelectorAll('.kxt').forEach(b=>b.onclick=()=>kcard(+b.dataset.n));
+  if(A.hzWire) A.hzWire();
+}
+function kcard(n){
+  A.stopSpeak();
+  const k = KX[n-1]; const fi = famIndex(k); const ex = kxExamples(k);
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="kBack">←</button><div class="dtitle left">Bộ ${esc(cap(k.hv))}<small>Bộ số ${k.n}/214 · ${k.s} nét</small></div></div>
+    <div class="rhero"><div class="rbase" id="kBase"></div><div class="rmeta" style="grid-column:span 2"><b>${esc(k.py)} · ${esc(cap(k.hv))}</b>${A.pbtn ? A.pbtn(k.g) : ''}<span>${esc(cap(k.vn))}</span><small>Chạm vào chữ để xem thứ tự nét</small></div></div>
+    ${k.v.length?`<div class="qsec"><p>Dạng biến thể</p><div class="kvars">${k.v.map((g,i)=>`<div class="kvar"><div class="rfg" id="kv${i}"></div><span>${g}</span>${A.pbtn ? A.pbtn(g) : ''}</div>`).join('')}</div></div>`:''}
+    ${fi>=0?`<button class="songbtn" id="kFam"><span>${FAM[fi].emo}</span><div><b>Xem thẻ chi tiết</b><small>Hình minh hoạ, tên gọi và vị trí của từng cách viết</small></div></button>`:''}
+    <div class="qsec"><p>Chữ HSK có bộ này (${ex.length})</p>${ex.length?`<div class="rex">${ex.map(c=>`<button class="fchip" data-jc="${c}">${c}</button>`).join('')}</div>`:'<p class="qhint">Chưa có chữ HSK 1–2 nào dùng bộ này.</p>'}</div>
+    <div class="btns"><button id="kPrev" ${n>1?'':'disabled'}>← Bộ ${n-1||''}</button><button class="pri" id="kNext" ${n<214?'':'disabled'}>Bộ ${n<214?n+1:''} →</button></div>
+  </div>`;
+  const w = writerInto($('#kBase'), k.g, 120); if(w) $('#kBase').onclick = ()=>w.animateCharacter();
+  k.v.forEach((g,i)=>{ const el = $('#kv'+i); const vw = writerInto(el, g, 64); if(vw) el.onclick = ()=>vw.animateCharacter(); });
+  root().querySelectorAll('.fchip').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.jc));
+  $('#kBack').onclick = ()=>all();
+  const kf = $('#kFam'); if(kf) kf.onclick = ()=>card(fi);
+  $('#kPrev').onclick = ()=>{ kcard(n-1); root().scrollTop=0; };
+  $('#kNext').onclick = ()=>{ kcard(n+1); root().scrollTop=0; };
+  root().scrollTop = 0;
+}
+A.radAll = all;
 };
 
 </script>
@@ -1929,7 +1993,8 @@ const TYPES = [
   {id:'Chỉ sự', short:'Chỉ sự', desc:'Dùng nét hoặc dấu để chỉ ý trừu tượng, ví dụ 上, 下, 一, 二, 三.'}
 ];
 let st = Object.assign({type:'Hình thanh', by:'sem', view:'cls'}, A.store.get('hzView', {}));
-A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="rad" aria-pressed="${v==='rad'}">Bộ thủ thông dụng</button></div>`;
+A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="rad" aria-pressed="${v==='rad'}">Bộ thủ hay gặp</button><button data-v="all" aria-pressed="${v==='all'}">Tất cả bộ thủ</button></div>`;
+A.hzWire = ()=>wireSw();
 function wireSw(){ const s = $('#hzSw'); if(s) s.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.view=b.dataset.v; save(); render(); }; }
 const save = ()=>A.store.set('hzView', st);
 
@@ -1967,6 +2032,7 @@ function practiceBtn(chars){ return `<button class="gprac" data-chars="${chars.j
 const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
 function render(){
   if(st.view==='rad' && A.radList){ A.radList(); wireSw(); return; }
+  if(st.view==='all' && A.radAll){ A.radAll(); wireSw(); return; }
   const all = Object.keys(C).filter(LVc);
   const G = { sem:{}, pho:{} }; Object.entries(GROUPS.sem).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.sem[k]=f; }); Object.entries(GROUPS.pho).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.pho[k]=f; });
   const counts = Object.fromEntries(TYPES.map(t=>[t.id, all.filter(c=>C[c].type===t.id).length]));
