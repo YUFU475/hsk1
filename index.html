@@ -440,8 +440,8 @@ body[data-tab="rad"] .lvrow,body[data-tab="pro"] .lvrow{justify-content:flex-end
 body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--paper) 60%) fixed, var(--paper)}
 .app{padding-top:10px}
 /* bottom navigation */
-.top{order:99;padding:8px 0 10px;margin-top:4px}
-.top .tabs{background:var(--card);border:1px solid var(--gold-soft);border-radius:18px;padding:4px;box-shadow:0 -6px 20px -14px rgba(90,60,30,.35);gap:2px}
+.top{order:0;padding:0 0 8px}
+.top .tabs{background:var(--card);border:1px solid var(--gold-soft);border-radius:18px;padding:4px;box-shadow:0 8px 20px -16px rgba(90,60,30,.4);gap:2px}
 .tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 1px 5px;border-radius:13px;font-size:11px;font-weight:600;color:var(--muted);min-width:0;flex:1 1 0}
 .tabs button .ti{display:grid;place-items:center;height:24px;font-style:normal}
 .tabs button .ti svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -468,6 +468,18 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .dtitle{letter-spacing:-.01em}
 .ch,.prow,.psent2,.dl{border-radius:16px}
+.front .tiles{gap:12px}
+.front .tile{border-width:2px}
+.front .py{font-size:32px;margin-top:22px;font-weight:600;letter-spacing:.01em}
+.front .vn-q{font-size:32px}
+.front .spk{width:54px;height:54px;margin-top:18px}.front .spk svg{width:24px;height:24px}
+.num b{font-size:15px}
+.head .w{font-size:52px}
+.head .p{font-size:23px}
+.head .hv{font-size:14px}
+.meaning .vn{font-size:24px}
+.meaning .en{font-size:15px}
+.back{padding:22px 18px 26px}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -585,7 +597,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790499510';
+    const V = '?v=1790499808';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -681,7 +693,9 @@ function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 function renderFront(w){
   const n = [...w.w].length;
-  const ts = n===1 ? 150 : n===2 ? 118 : 92;
+  const vw = Math.min(($('#stage') && $('#stage').clientWidth) || 360, 560) - 40;
+  const vh = (($('#stage') && $('#stage').clientHeight) || 560);
+  const ts = Math.round(Math.min(n===1 ? vw*0.66 : n===2 ? vw*0.46 : n===3 ? vw*0.31 : vw*0.235, n===1 ? vh*0.42 : vh*0.34, n===1 ? 280 : 200));
   const inT = order.filter(i=>tkey(W[i])===tkey(w)); const k = inT.indexOf(order[pos]);
   $('#fNum').innerHTML = `<b>${esc(tname(w))}${lvTag(w.lv)}</b>Thẻ ${k+1} / ${inT.length}`;
   let h;
