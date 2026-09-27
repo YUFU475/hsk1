@@ -442,11 +442,11 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 /* bottom navigation */
 .top{order:0;padding:0 0 8px}
 .top .tabs{background:var(--card);border:1px solid var(--gold-soft);border-radius:18px;padding:4px;box-shadow:0 8px 20px -16px rgba(90,60,30,.4);gap:2px}
-.tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 1px 5px;border-radius:13px;font-size:11px;font-weight:600;color:var(--muted);min-width:0;flex:1 1 0}
+.tabs button{display:flex;align-items:center;justify-content:center;padding:9px 2px;border-radius:12px;font-size:12.5px;font-weight:600;color:var(--muted);min-width:0;flex:1 1 auto}
 .tabs button .ti{display:grid;place-items:center;height:24px;font-style:normal}
 .tabs button .ti svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabs button .tg{font-family:var(--hz);font-weight:800;font-size:20px;line-height:1}
-.tabs button .tl{font-size:10.5px;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tabs button .tl{font-size:12.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .tabs button[aria-selected="true"]{background:var(--red-soft);color:var(--red);box-shadow:none}
 /* level row as segmented pill */
 .lvrow{padding:0 0 12px}
@@ -461,25 +461,12 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .opt{border-radius:15px;transition:transform .12s,background .2s,border-color .2s}
 .qt{font-size:22px;letter-spacing:-.01em}
 .qstart{border-radius:16px;box-shadow:0 10px 22px -14px rgba(181,66,61,.9)}
-.front .py{color:var(--ink);opacity:.85}
 .hint{font-size:13px}
 .hint::before{content:"👆 "}
 .known{border-radius:16px}.nav{border-radius:16px}
 .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .dtitle{letter-spacing:-.01em}
 .ch,.prow,.psent2,.dl{border-radius:16px}
-.front .tiles{gap:12px}
-.front .tile{border-width:2px}
-.front .py{font-size:32px;margin-top:22px;font-weight:600;letter-spacing:.01em}
-.front .vn-q{font-size:32px}
-.front .spk{width:54px;height:54px;margin-top:18px}.front .spk svg{width:24px;height:24px}
-.num b{font-size:15px}
-.head .w{font-size:52px}
-.head .p{font-size:23px}
-.head .hv{font-size:14px}
-.meaning .vn{font-size:24px}
-.meaning .en{font-size:15px}
-.back{padding:22px 18px 26px}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -504,7 +491,7 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 <div id="boot" class="boot"><div class="bspin"></div><p>Đang tải bộ thẻ…</p></div>
 <div class="app">
   <header class="top">
-    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true"><i class="ti"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="17" rx="2.5"/><path d="M3.5 7.5v11A2.5 2.5 0 0 0 6 21h9"/></svg></i><span class="tl">Thẻ từ</span></button><button id="tabHz" role="tab" aria-selected="false"><i class="ti"><span class="tg">字</span></i><span class="tl">Chữ Hán</span></button><button id="tabRad" role="tab" aria-selected="false"><i class="ti"><span class="tg">部</span></i><span class="tl">Bộ thủ</span></button><button id="tabPro" role="tab" aria-selected="false"><i class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3 12.5h18"/></svg></i><span class="tl">Ngành</span></button><button id="tabQuiz" role="tab" aria-selected="false"><i class="ti"><svg viewBox="0 0 24 24"><path d="M5 19l1-4L16 5l3 3L9 18z"/><path d="M14 7l3 3"/></svg></i><span class="tl">Bài tập</span></button></div>
+    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true"><span class="tl">Thẻ từ</span></button><button id="tabHz" role="tab" aria-selected="false"><span class="tl">Chữ Hán</span></button><button id="tabRad" role="tab" aria-selected="false"><span class="tl">Bộ thủ</span></button><button id="tabPro" role="tab" aria-selected="false"><span class="tl">Chuyên ngành</span></button><button id="tabQuiz" role="tab" aria-selected="false"><span class="tl">Bài tập</span></button></div>
   </header>
   <div class="lvrow"><div class="lvbar" id="lvbar"><button data-v="1">HSK 1</button><button data-v="2">HSK 2</button><button data-v="all">Cả hai</button></div>
     <button class="icon-btn sm" id="btnSet" aria-label="Tuỳ chọn" title="Tuỳ chọn">
@@ -597,7 +584,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790499808';
+    const V = '?v=1790500058';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -693,9 +680,7 @@ function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 function renderFront(w){
   const n = [...w.w].length;
-  const vw = Math.min(($('#stage') && $('#stage').clientWidth) || 360, 560) - 40;
-  const vh = (($('#stage') && $('#stage').clientHeight) || 560);
-  const ts = Math.round(Math.min(n===1 ? vw*0.66 : n===2 ? vw*0.46 : n===3 ? vw*0.31 : vw*0.235, n===1 ? vh*0.42 : vh*0.34, n===1 ? 280 : 200));
+  const ts = n===1 ? 150 : n===2 ? 118 : 92;
   const inT = order.filter(i=>tkey(W[i])===tkey(w)); const k = inT.indexOf(order[pos]);
   $('#fNum').innerHTML = `<b>${esc(tname(w))}${lvTag(w.lv)}</b>Thẻ ${k+1} / ${inT.length}`;
   let h;
