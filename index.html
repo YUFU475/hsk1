@@ -468,6 +468,30 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .dtitle{letter-spacing:-.01em}
 .ch,.prow,.psent2,.dl{border-radius:16px}
 .flipback{display:block;width:100%;margin:18px 0 4px;border:1.5px dashed var(--gold);background:transparent;border-radius:14px;padding:12px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.colg{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px}
+.colt{border:1px solid var(--gold-soft);background:var(--card);border-radius:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.2}
+.colt .cc{font-family:var(--hz);font-size:28px;font-weight:700;color:var(--red)}.colt .cp{font-size:12px;color:var(--muted)}.colt .cn{font-size:11px;font-weight:700;color:var(--blue)}
+.colhero{display:flex;gap:14px;align-items:center;background:var(--card);border:2.5px solid #E86A9A;border-radius:22px;padding:14px 16px;margin:6px 0 12px;box-shadow:0 12px 28px -22px rgba(232,106,154,.9)}
+.colbig{display:flex;flex-direction:column;align-items:center;gap:4px}.colbig span{font-family:var(--hz);font-size:72px;font-weight:800;line-height:1}
+.colmeta{display:flex;flex-direction:column;gap:4px}.colmeta b{font-size:17px}.colmeta span{font-size:17px}.colmeta .type{align-self:flex-start;font-style:normal}
+.colparts{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.colpart{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--c);border-radius:14px;padding:8px 12px}
+.colpart .pg{font-family:var(--hz);font-size:30px;font-weight:700;color:var(--c)}.colpart b{display:block;font-size:14px}.colpart small{color:var(--muted);font-size:12.5px}
+.colparts .plus{font-size:22px;color:var(--muted);font-weight:700}
+.colstory{background:linear-gradient(135deg,#C62828,#E53935);color:#fff;border-radius:18px;padding:12px 14px;margin-bottom:12px}
+.colstory b{font-size:13.5px}.colstory p{margin:4px 0 0;font-size:15px;line-height:1.5}
+.colex{position:relative;background:#FDEFF4;border:1.5px dashed #E86A9A;border-radius:18px;padding:12px 44px 12px 14px;margin-bottom:14px}
+:root[data-theme="dark"] .colex{background:var(--red-soft)}
+.colex .tag{display:inline-block;background:#E86A9A;color:#fff;font-weight:700;font-size:12.5px;border-radius:8px;padding:2px 10px;margin-bottom:6px}
+.colex .zh{font-family:var(--hz);font-size:20px}.colex .zh b,.colw .wz b{color:var(--red)}
+.colex .spk{position:absolute;right:10px;top:10px}
+.colweb{position:relative;margin-bottom:14px}
+.colcenter{width:110px;height:110px;margin:0 auto -18px;position:relative;z-index:1;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#FF7A7A,#E53935);border-radius:50%;box-shadow:0 0 0 6px var(--paper),0 10px 24px -10px rgba(229,57,53,.8)}
+.colcenter span{font-family:var(--hz);font-size:56px;font-weight:800;color:#fff}
+.colwords{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-top:30px;border-top:3px solid transparent;background:linear-gradient(var(--paper),var(--paper)) padding-box}
+.colw{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;background:var(--card);border:1px solid var(--gold-soft);border-left:5px solid var(--c);border-radius:14px;padding:9px 10px;cursor:pointer;line-height:1.3;position:relative}
+.colw .wz{font-family:var(--hz);font-size:22px;font-weight:700}.colw .wp{font-size:13px;color:var(--muted)}.colw .wv{font-size:13.5px}
+.colw .lvb{position:absolute;top:8px;right:8px;margin:0}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -585,14 +609,14 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790500629';
+    const V = '?v=1790501340';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
       DATA=got[0]; STROKES=got[1]; DLGS=got[2];
       (DATA.akeys||[]).forEach(k=>{ if(!(k in AUDIO)) AUDIO[k]=true; });
     }
-    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad(); if(window.__pro) window.__pro();
+    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad(); if(window.__pro) window.__pro(); if(window.__collo) window.__collo();
     if(box) box.remove();
     if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json','ap.json'] : ['a1.json','ac.json','a2.json','ap.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
@@ -1585,6 +1609,67 @@ A.startCustomQuiz = (pool)=>{ A.showTab('quiz'); const ts = cfg.types.filter(t=>
 };
 
 </script>
+<script>window.__collo = function(){
+const A = window.APP; if(!A) return;
+const {W, C, R, esc, cap, SPK} = A;
+const DEC = (window.DATA && DATA.dec) || {};
+const CM = (window.DATA && DATA.comp) || {};
+const CIT = A.CIT || {};
+const $ = s => document.querySelector(s);
+const root = () => $('#hzv');
+const LVw = w => A.inLv ? A.inLv(w) : true;
+let q = '';
+const COLORS = ['#E4572E','#F3A712','#29A36A','#2E86AB','#7B5EA7','#D1495B','#00A6A6','#8C6D46'];
+function wordsOf(c){ return W.filter(w=>LVw(w) && [...w.w].includes(c) && w.w!==c); }
+function compInfo(x){ if(C[x]) return {py:CIT[x]||'', hv:C[x].hv, vn:C[x].vn}; if(CM[x]) return CM[x]; if(R[x]) return {py:R[x].py, hv:R[x].hv, vn:R[x].vn}; return {py:'',hv:'',vn:''}; }
+function list(){
+  const fold = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
+  const chars = Object.keys(C).map(c=>({c, n:wordsOf(c).length})).filter(x=>x.n>=1);
+  chars.sort((a,b)=>b.n-a.n);
+  const qq = fold(q);
+  const items = chars.filter(x=>!q || x.c===q || fold(C[x.c].hv).includes(qq) || fold(CIT[x.c]).includes(qq) || fold(C[x.c].vn).includes(qq));
+  root().innerHTML = `<div class="qwrap">${A.hzSwitch('col')}
+    <h2 class="qt">Học theo từ ghép</h2>
+    <p class="qhint" style="margin-top:-8px!important">Mỗi chữ Hán là một "gốc", ghép với chữ khác thành nhiều từ. Học theo nhóm từ ghép giúp nhớ hệ thống và nhớ lâu. Chạm vào chữ để xem sơ đồ.</p>
+    <input class="search" id="colQ" type="search" placeholder="Tìm chữ, Hán Việt, pinyin hoặc nghĩa…" value="${esc(q)}">
+    <div class="colg">${items.map(x=>`<button class="colt" data-c="${x.c}"><span class="cc">${x.c}</span><span class="cp">${esc(CIT[x.c]||'')}</span><span class="cn">${x.n} từ</span></button>`).join('') || '<div class="empty">Không tìm thấy chữ phù hợp.</div>'}</div></div>`;
+  const inp = $('#colQ'); inp.oninput = ()=>{ q = inp.value.trim(); const p = inp.selectionStart; list(); const i2=$('#colQ'); i2.focus(); try{ i2.setSelectionRange(p,p); }catch(e){} };
+  root().querySelectorAll('.colt').forEach(b=>b.onclick=()=>map(b.dataset.c));
+  A.hzWireSw && A.hzWireSw();
+}
+function map(c){
+  A.stopSpeak();
+  const d = C[c]; const ws = wordsOf(c);
+  const self = W.find(w=>w.w===c) || ws[0];
+  const dec = DEC[c];
+  const parts = dec ? [dec[1], dec[2]] : [];
+  const ex = self ? self.ex : null;
+  const mark = s => esc(s).split(esc(c)).join(`<b>${esc(c)}</b>`);
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="colBack">←</button><div class="dtitle left">Từ ghép với ${c}<small>${ws.length} từ trong HSK ${A.level&&A.level()!=='all'?A.level():'1–2'}</small></div></div>
+    <div class="colhero">
+      <div class="colbig"><span>${c}</span>${A.pbtn ? A.pbtn(c) : ''}</div>
+      <div class="colmeta"><b>/${esc(CIT[c]||'')}/ – [${esc(d.hv)}]</b><span>${esc(cap(d.vn))}</span><em class="type">${esc(d.type)}</em></div>
+    </div>
+    ${parts.length?`<div class="colparts">${parts.map((x,i)=>{ const inf = compInfo(x); return `<div class="colpart" style="--c:${COLORS[i+3]}"><span class="pg">${x}</span><div><b>${esc(cap(inf.hv||''))}</b><small>${esc(inf.vn||'')}</small></div></div>`; }).join('<span class="plus">+</span>')}</div>`:''}
+    <div class="colstory"><b>💡 Mẹo nhớ</b><p>${esc(d.note)}</p></div>
+    ${ex?`<div class="colex"><span class="tag">Ví dụ</span><div class="zh">${mark(ex[0])}</div><div class="epy">${esc(ex[1])}</div><div class="evn">${esc(ex[2])}</div>${A.AUDIO && A.AUDIO['e'+self.n] ? `<button class="spk sm" data-audio="e${self.n}">${SPK}</button>`:''}</div>`:''}
+    <p class="qhint" style="text-align:center;margin:0 0 8px!important">Chạm vào từ để nghe, chạm 2 lần để mở thẻ từ</p><div class="colweb">
+      <div class="colcenter"><span>${c}</span></div>
+      <div class="colwords">${ws.map((w,i)=>`<button class="colw" data-n="${w.n}" style="--c:${COLORS[i%COLORS.length]}"><span class="wz">${mark(w.w)}</span><span class="wp">${esc(w.py)}</span><span class="wv">${esc(cap(w.vn))}</span><span class="lvb l${w.lv||1}">HSK ${w.lv||1}</span></button>`).join('')}</div>
+    </div>
+    <div class="btns col"><button class="pri" id="colPr">Luyện ${ws.length} từ này</button></div>
+  </div>`;
+  $('#colBack').onclick = list;
+  root().querySelectorAll('.colw').forEach(b=>b.onclick=()=>{ const w = W.find(x=>x.n===+b.dataset.n); if(w){ const k='w'+w.n; if(A.AUDIO && typeof A.AUDIO[k]==='string') A.speak(k, b, true); } });
+  root().querySelectorAll('.colw').forEach(b=>b.ondblclick=()=>{ const w = W.find(x=>x.n===+b.dataset.n); if(w) A.jumpToChar(w.w); });
+  $('#colPr').onclick = ()=>A.startCustomQuiz(ws.concat(self && self.w===c ? [self] : []));
+  root().scrollTop = 0;
+}
+A.colList = list;
+};
+
+</script>
 <script>window.__pro = function(){
 const A = window.APP; if(!A) return;
 const {W, esc, cap, SPK} = A;
@@ -2159,8 +2244,8 @@ const TYPES = [
   {id:'Chỉ sự', short:'Chỉ sự', desc:'Dùng nét hoặc dấu để chỉ ý trừu tượng, ví dụ 上, 下, 一, 二, 三.'}
 ];
 let st = Object.assign({type:'Hình thanh', by:'sem', view:'cls'}, A.store.get('hzView', {}));
-A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="rad" aria-pressed="${v==='rad'}">Bộ thủ hay gặp</button><button data-v="all" aria-pressed="${v==='all'}">Tất cả bộ thủ</button></div>`;
-A.hzWire = ()=>wireSw();
+A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="col" aria-pressed="${v==='col'}">Học theo từ ghép</button></div>`;
+A.hzWire = ()=>wireSw(); A.hzWireSw = ()=>wireSw();
 function wireSw(){ const s = $('#hzSw'); if(s) s.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.view=b.dataset.v; save(); render(); }; }
 const save = ()=>A.store.set('hzView', st);
 
@@ -2197,6 +2282,7 @@ function practiceBtn(chars){ return `<button class="gprac" data-chars="${chars.j
 
 const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
 function render(){
+  if(st.view==='col' && A.colList){ A.colList(); return; }
   const all = Object.keys(C).filter(LVc);
   const G = { sem:{}, pho:{} }; Object.entries(GROUPS.sem).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.sem[k]=f; }); Object.entries(GROUPS.pho).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.pho[k]=f; });
   const counts = Object.fromEntries(TYPES.map(t=>[t.id, all.filter(c=>C[c].type===t.id).length]));
@@ -2232,13 +2318,14 @@ function render(){
       body += `<div class="grp2"><div class="hts">${cs.map(c=>tile(c)).join('')}</div><div class="hnotes">${cs.map(c=>`<p><b>${c}</b> ${esc(C[c].note)}</p>`).join('')}</div></div>`;
     }
   }
-  root().innerHTML = `<div class="qwrap">
+  root().innerHTML = `<div class="qwrap">${A.hzSwitch('cls')}
     <h2 class="qt">Phân loại chữ Hán</h2>
     <p class="qhint" style="margin-top:-8px!important">${all.length} chữ ${A.level&&A.level()==='2'?'mới của HSK 2':A.level&&A.level()==='1'?'của HSK 1':'của HSK 1 và HSK 2'}, chia theo cách cấu tạo. Chạm vào chữ để mở thẻ.</p>
     <div class="tgrid">${TYPES.map(t=>`<button class="tcard${t.id===st.type?' on':''}" data-t="${t.id}"><b>${t.short}</b><span>${counts[t.id]} chữ</span></button>`).join('')}</div>
     <p class="tdesc">${esc(T.desc)}</p>
     ${body}
   </div>`;
+  wireSw();
   root().querySelectorAll('.tcard').forEach(b=>b.onclick=()=>{ st.type=b.dataset.t; save(); render(); root().scrollTop=0; });
   const by = $('#hzBy'); if(by) by.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.by=b.dataset.v; save(); render(); };
   root().querySelectorAll('.ht').forEach(b=>b.onclick=()=>A.jumpToChar(b.dataset.c));
