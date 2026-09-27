@@ -467,6 +467,7 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .dtitle{letter-spacing:-.01em}
 .ch,.prow,.psent2,.dl{border-radius:16px}
+.flipback{display:block;width:100%;margin:18px 0 4px;border:1.5px dashed var(--gold);background:transparent;border-radius:14px;padding:12px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -584,7 +585,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790500058';
+    const V = '?v=1790500629';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -730,7 +731,8 @@ function renderBack(w){
     ${cards}
     <div class="legend"><span><i style="background:var(--blue)"></i>Nét thuộc bộ thủ</span><span><i style="background:var(--ink)"></i>Phần còn lại</span></div>
     <div class="label">Ví dụ</div>
-    <div class="ex"><div><div class="zh">${highlight(w.ex[0], w.w)}</div><div class="epy">${esc(w.ex[1])}</div><div class="evn">${esc(w.ex[2])}</div></div><button class="spk" data-audio="e${w.n}" aria-label="Nghe câu ví dụ">${SPK}</button></div>`;
+    <div class="ex"><div><div class="zh">${highlight(w.ex[0], w.w)}</div><div class="epy">${esc(w.ex[1])}</div><div class="evn">${esc(w.ex[2])}</div></div><button class="spk" data-audio="e${w.n}" aria-label="Nghe câu ví dụ">${SPK}</button></div>
+    <button class="flipback" id="flipBack">↺ Lật lại mặt trước</button>`;
   $('#back').scrollTop = 0;
   if(window.HanziWriter){
     const cs = getComputedStyle(document.documentElement);
@@ -806,6 +808,7 @@ document.addEventListener('click', e=>{
 $('#front').addEventListener('click', ()=>order.length && setFlip(true));
 $('#front').addEventListener('keydown', e=>{ if(e.target.closest('.spk')) return; if(e.key==='Enter'||e.key===' '){ e.preventDefault(); order.length && setFlip(true); }});
 $('#back').addEventListener('click', e=>{
+  if(e.target.closest('#flipBack')){ setFlip(false); return; }
   const fc = e.target.closest('.fchip'); if(fc){ jumpToChar(fc.dataset.jc); return; }
   const b = e.target.closest('button[data-act]');
   if(b){
@@ -815,7 +818,9 @@ $('#back').addEventListener('click', e=>{
     else { b.classList.add('on'); wr.quiz({ showHintAfterMisses:2, onComplete:()=>b.classList.remove('on') }); }
     return;
   }
-  if(e.target.closest('#backHead')) setFlip(false);
+  if(e.target.closest('button, a, input, textarea, select, details, summary, .tile[data-char], .rad, .fam')) return;
+  if(window.getSelection && String(window.getSelection()).length) return;
+  setFlip(false);
 });
 $('#prev').onclick = ()=>go(-1);
 $('#next').onclick = ()=>go(1);
