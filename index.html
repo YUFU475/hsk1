@@ -192,6 +192,7 @@ body:not([data-tab="quiz"]) .quiz{display:none}
 body:not([data-tab="hz"]) #hzv{display:none}
 body:not([data-tab="rad"]) #radv{display:none}
 body:not([data-tab="pro"]) #prov{display:none}
+body:not([data-tab="gt"]) #gtv{display:none}
 .quiz,.hzv{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:0 -14px;padding:0 14px 24px}
 .qwrap{padding-top:4px}
 .qt{font-size:20px;margin:6px 0 14px}
@@ -429,8 +430,8 @@ details.trd summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:1
 .pst{flex:1;min-width:0}.pzh2{font-family:var(--hz);font-size:19px;line-height:1.5}.pzh2 mark{background:none;color:var(--red);font-weight:700}
 .progress .icon-btn{flex:none}
 .progress{gap:8px}
-body[data-tab="rad"] .lvbar,body[data-tab="pro"] .lvbar{display:none}
-body[data-tab="rad"] .lvrow,body[data-tab="pro"] .lvrow{justify-content:flex-end}
+body[data-tab="rad"] .lvbar,body[data-tab="pro"] .lvbar,body[data-tab="gt"] .lvbar{display:none}
+body[data-tab="rad"] .lvrow,body[data-tab="pro"] .lvrow,body[data-tab="gt"] .lvrow{justify-content:flex-end}
 .kmean{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
 .km{background:var(--card);border:1px solid var(--gold-soft);border-left:4px solid var(--blue);border-radius:10px;padding:10px 12px}
 .km.ind{border-left-color:var(--red)}
@@ -535,6 +536,12 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .gtd{margin-bottom:14px}.gth{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.gth b{font-family:var(--hz);font-size:17px;color:var(--blue)}
 .gtd .dl{margin-bottom:6px}
 .gl.now{border-color:var(--red);background:var(--red-soft)}
+.top .tabs{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.top .tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 1 auto;padding:9px 4px}
+.tabs button .tl{font-size:12px!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important}
+.tabs button{min-width:max-content!important}
+.top .tabs{gap:0!important;padding:3px!important}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -559,7 +566,7 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 <div id="boot" class="boot"><div class="bspin"></div><p>Đang tải bộ thẻ…</p></div>
 <div class="app">
   <header class="top">
-    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true"><span class="tl">Thẻ từ</span></button><button id="tabHz" role="tab" aria-selected="false"><span class="tl">Chữ Hán</span></button><button id="tabRad" role="tab" aria-selected="false"><span class="tl">Bộ thủ</span></button><button id="tabPro" role="tab" aria-selected="false"><span class="tl">Chuyên ngành</span></button><button id="tabQuiz" role="tab" aria-selected="false"><span class="tl">Bài tập</span></button></div>
+    <div class="tabs" role="tablist"><button id="tabCards" role="tab" aria-selected="true"><span class="tl">Thẻ từ</span></button><button id="tabGt" role="tab" aria-selected="false"><span class="tl">Giáo trình</span></button><button id="tabHz" role="tab" aria-selected="false"><span class="tl">Chữ Hán</span></button><button id="tabRad" role="tab" aria-selected="false"><span class="tl">Bộ thủ</span></button><button id="tabPro" role="tab" aria-selected="false"><span class="tl">Ngành</span></button><button id="tabQuiz" role="tab" aria-selected="false"><span class="tl">Bài tập</span></button></div>
   </header>
   <div class="lvrow"><div class="lvbar" id="lvbar"><button data-v="1">HSK 1</button><button data-v="2">HSK 2</button><button data-v="all">Cả hai</button></div>
     <button class="icon-btn sm" id="btnSet" aria-label="Tuỳ chọn" title="Tuỳ chọn">
@@ -591,6 +598,7 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
   <main class="hzv" id="hzv"></main>
   <main class="hzv radv" id="radv"></main>
   <main class="hzv" id="prov"></main>
+  <main class="hzv" id="gtv"></main>
 </div>
 
 <div class="toast" id="toast" role="status"></div>
@@ -652,7 +660,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790690737';
+    const V = '?v=1790696302';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -1046,10 +1054,11 @@ render();
 setTimeout(checkHash, 300);
 function showTab(t){
   document.body.dataset.tab = t;
-  $('#tabCards').setAttribute('aria-selected', t==='cards'); $('#tabQuiz').setAttribute('aria-selected', t==='quiz'); $('#tabHz').setAttribute('aria-selected', t==='hz'); $('#tabRad').setAttribute('aria-selected', t==='rad'); $('#tabPro').setAttribute('aria-selected', t==='pro');
+  $('#tabCards').setAttribute('aria-selected', t==='cards'); $('#tabQuiz').setAttribute('aria-selected', t==='quiz'); $('#tabHz').setAttribute('aria-selected', t==='hz'); $('#tabRad').setAttribute('aria-selected', t==='rad'); $('#tabPro').setAttribute('aria-selected', t==='pro'); $('#tabGt').setAttribute('aria-selected', t==='gt'); const sel=document.querySelector('.tabs button[aria-selected="true"]'); if(sel && sel.scrollIntoView) sel.scrollIntoView({block:'nearest',inline:'center'});
   stopSpeak();
   if(t==='quiz'){ setFlip(false); window.APP.onQuizTab && window.APP.onQuizTab(); }
   else if(t==='hz'){ setFlip(false); window.APP.onHzTab && window.APP.onHzTab(); }
+  else if(t==='gt'){ setFlip(false); window.APP.onGtTab && window.APP.onGtTab(); }
   else if(t==='pro'){ setFlip(false); window.APP.onProTab && window.APP.onProTab(); }
   else if(t==='rad'){ setFlip(false); window.APP.onRadTab && window.APP.onRadTab(); }
   else { render(); }
@@ -1059,6 +1068,7 @@ $('#tabQuiz').onclick = ()=>showTab('quiz');
 $('#tabHz').onclick = ()=>showTab('hz');
 $('#tabRad').onclick = ()=>showTab('rad');
 $('#tabPro').onclick = ()=>showTab('pro');
+$('#tabGt').onclick = ()=>showTab('gt');
 function syncLv(){ $('#lvbar').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===opts.level)); }
 syncLv();
 const lvHooks = [];
@@ -1788,7 +1798,7 @@ const A = window.APP; if(!A) return;
 const {W, esc, cap, SPK} = A;
 const GT = (window.DATA && DATA.gt) || [];
 const $ = s => document.querySelector(s);
-const root = () => $('#prov');
+const root = () => $('#gtv');
 const spk = k => (k && A.AUDIO && A.AUDIO[k]) ? `<button class="spk sm" data-audio="${k}" aria-label="Nghe">${SPK}</button>` : '';
 let cur = null, view = 'words';
 let sq = {a:null, keys:[], i:0, btn:null};
@@ -1798,9 +1808,8 @@ function playAll(keys, btn){ if(sq.btn===btn){ sstop(); return; } A.stopSpeak();
 function list(){
   sstop();
   root().innerHTML = `<div class="qwrap">
-    <div class="qhead"><button class="qx" id="gtBack">←</button><div class="dtitle left">📘 Giáo trình HSK 1<small>15 bài · từ vựng, ví dụ và hội thoại theo giáo trình</small></div></div>
+    <h2 class="qt">📘 Giáo trình HSK 1</h2><p class="qhint" style="margin-top:-8px!important">15 bài · từ vựng, ví dụ và hội thoại theo giáo trình</p>
     <div class="gtl">${GT.map((l,i)=>`<button class="gtb" data-i="${i}"><span class="gn">${l.n}</span><div><b>${esc(l.zh)}</b><small>${esc(l.vn)}</small><em>${l.words.length} từ · ${l.dlg.length} hội thoại</em></div></button>`).join('')}</div></div>`;
-  $('#gtBack').onclick = ()=>A.proHome();
   root().querySelectorAll('.gtb').forEach(b=>b.onclick=()=>{ cur=GT[+b.dataset.i]; view='words'; lesson(); });
   root().scrollTop=0;
 }
@@ -1827,7 +1836,8 @@ function lesson(){
   root().scrollTop=0;
 }
 document.addEventListener('click', e=>{ if(e.target.closest('.spk')) sstop(); }, true);
-A.openGT = list;
+A.openGT = ()=>A.showTab('gt');
+A.onGtTab = ()=>{ if(!cur) list(); };
 };
 
 </script>
@@ -1846,10 +1856,8 @@ function home(){
   A.stopSpeak();
   root().innerHTML = `<div class="qwrap"><h2 class="qt">Học theo chuyên ngành</h2>
     <p class="qhint" style="margin-top:-8px!important">Từ vựng chuyên ngành và mẫu câu thường gặp trong công việc, kèm phát âm và bài luyện tập.</p>
-    <button class="songbtn gtbtn" id="gtOpen"><span>📘</span><div><b>Giáo trình HSK 1 <em class="pzh">15 bài</em></b><small>Từ vựng, ví dụ và hội thoại theo giáo trình, bài 1 đến bài 15</small></div></button>
     ${PRO.map((d,i)=>`<button class="songbtn" data-i="${i}"><span>${d.emo}</span><div><b>${esc(d.vn)} <em class="pzh">${esc(d.zh)}</em></b><small>${esc(d.desc)}</small><small class="pct">${d.words.length} từ vựng · ${d.sents.length} mẫu câu</small></div></button>`).join('')}</div>`;
   root().querySelectorAll('.songbtn[data-i]').forEach(b=>b.onclick=()=>{ cur = PRO[+b.dataset.i]; view='words'; domain(); });
-  $('#gtOpen').onclick = ()=>A.openGT && A.openGT();
   root().scrollTop = 0;
 }
 function hl(zh){
