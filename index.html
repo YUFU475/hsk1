@@ -542,7 +542,8 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .tabs button .tl{font-size:12px!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important}
 .tabs button{min-width:max-content!important}
 .top .tabs{gap:0!important;padding:3px!important}
-.tw{border-bottom:1.5px dotted var(--blue);cursor:pointer}
+.tw{display:inline-block;margin:3px 4px 3px 0;padding:2px 6px;border-radius:8px;background:var(--blue-soft);border:1px solid rgba(61,110,140,.25);cursor:pointer;line-height:1.35}
+.gex .gz,.gtd .dz{line-height:2.1;display:block}
 .tw:active{background:var(--blue-soft)}
 .prow.tap{cursor:pointer}
 .prow.tap .phz{color:var(--blue);text-decoration:underline dotted;text-underline-offset:4px}
@@ -666,7 +667,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790697551';
+    const V = '?v=1790698003';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
