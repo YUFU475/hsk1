@@ -542,6 +542,12 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .tabs button .tl{font-size:12px!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important}
 .tabs button{min-width:max-content!important}
 .top .tabs{gap:0!important;padding:3px!important}
+.tw{border-bottom:1.5px dotted var(--blue);cursor:pointer}
+.tw:active{background:var(--blue-soft)}
+.prow.tap{cursor:pointer}
+.prow.tap .phz{color:var(--blue);text-decoration:underline dotted;text-underline-offset:4px}
+.backgt{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--blue);color:#fff;border:0;border-radius:22px;padding:10px 18px;font-weight:700;font-size:14px;box-shadow:0 8px 20px -8px rgba(0,0,0,.4);cursor:pointer}
+body:not([data-tab="cards"]) .backgt{display:none}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -660,7 +666,7 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790696302';
+    const V = '?v=1790697551';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
@@ -1796,7 +1802,14 @@ A.colPoster = poster;
 <script>window.__gt = function(){
 const A = window.APP; if(!A) return;
 const {W, esc, cap, SPK} = A;
-const GT = (window.DATA && DATA.gt) || [];
+const SETS = {1:(window.DATA && DATA.gt) || [], 2:(window.DATA && DATA.gt2) || []};
+let lvl = A.store.get('gtLv', 1); let GT = SETS[lvl];
+const DICT = {}; W.forEach(w=>{ if(!DICT[w.w]) DICT[w.w]=w; });
+const MAXL = 4;
+function seg(s){ const ch=[...s]; let out='', i=0; while(i<ch.length){ let hit=null; for(let L=Math.min(MAXL,ch.length-i); L>=1; L--){ const t=ch.slice(i,i+L).join(''); if(DICT[t]){ hit=t; break; } } if(hit){ out+=`<span class="tw" data-w="${esc(hit)}">${esc(hit)}</span>`; i+=[...hit].length; } else { out+=esc(ch[i]); i++; } } return out; }
+function bestWord(w){ if(DICT[w]) return w; const ch=[...w]; for(let L=ch.length-1; L>=1; L--) for(let i=0;i+L<=ch.length;i++){ const t=ch.slice(i,i+L).join(''); if(DICT[t]) return t; } return null; }
+function jump(w){ const b = bestWord(w); if(!b){ A.toast('Từ này chưa có thẻ trong 500 từ HSK 1–2.'); return; } showBack(); A.jumpToChar(b); }
+function showBack(){ let el=document.getElementById('backGt'); if(!el){ el=document.createElement('button'); el.id='backGt'; el.className='backgt'; el.textContent='← Về giáo trình'; el.onclick=()=>{ el.remove(); A.showTab('gt'); }; document.body.appendChild(el); } }
 const $ = s => document.querySelector(s);
 const root = () => $('#gtv');
 const spk = k => (k && A.AUDIO && A.AUDIO[k]) ? `<button class="spk sm" data-audio="${k}" aria-label="Nghe">${SPK}</button>` : '';
@@ -1808,8 +1821,10 @@ function playAll(keys, btn){ if(sq.btn===btn){ sstop(); return; } A.stopSpeak();
 function list(){
   sstop();
   root().innerHTML = `<div class="qwrap">
-    <h2 class="qt">📘 Giáo trình HSK 1</h2><p class="qhint" style="margin-top:-8px!important">15 bài · từ vựng, ví dụ và hội thoại theo giáo trình</p>
+    <div class="seg" id="gtLv"><button data-v="1" aria-pressed="${lvl===1}">Giáo trình HSK 1</button><button data-v="2" aria-pressed="${lvl===2}">Giáo trình HSK 2</button></div>
+    <h2 class="qt" style="margin-top:14px">📘 Giáo trình HSK ${lvl}</h2><p class="qhint" style="margin-top:-8px!important">${GT.length} bài · từ vựng, ví dụ và hội thoại · chạm vào từ để mở flashcard</p>
     <div class="gtl">${GT.map((l,i)=>`<button class="gtb" data-i="${i}"><span class="gn">${l.n}</span><div><b>${esc(l.zh)}</b><small>${esc(l.vn)}</small><em>${l.words.length} từ · ${l.dlg.length} hội thoại</em></div></button>`).join('')}</div></div>`;
+  $('#gtLv').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; lvl=+b.dataset.v; A.store.set('gtLv',lvl); GT=SETS[lvl]; cur=null; list(); };
   root().querySelectorAll('.gtb').forEach(b=>b.onclick=()=>{ cur=GT[+b.dataset.i]; view='words'; lesson(); });
   root().scrollTop=0;
 }
@@ -1817,19 +1832,22 @@ function lesson(){
   A.stopSpeak(); sstop();
   const l = cur; let body='';
   if(view==='words'){
-    body = l.words.map(w=>`<div class="gtw"><div class="prow"><span class="phz">${esc(w.w)}</span><div class="pinf"><b>${esc(w.py)}</b><span>${w.pos?`<i class="gpos">${esc(w.pos)}</i> `:''}${esc(cap(w.vn))}</span></div>${spk(w.hk||w.ak)}</div>
-      ${w.ex.length?`<div class="gex">${w.ex.map(e=>`<div><span class="gz">${esc(e.zh).split(esc(w.w.replace(/（.*）/,''))).join('<b>'+esc(w.w.replace(/（.*）/,''))+'</b>')}</span><span class="gxp">${esc(e.py)}</span><span class="gv">${esc(e.vn)}</span></div>`).join('')}</div>`:''}</div>`).join('');
+    body = l.words.map(w=>`<div class="gtw"><div class="prow tap" data-jw="${esc(w.w)}"><span class="phz">${esc(w.w)}</span><div class="pinf"><b>${esc(w.py)}</b><span>${w.pos?`<i class="gpos">${esc(w.pos)}</i> `:''}${esc(cap(w.vn))}</span></div>${spk(w.hk||w.ak)}</div>
+      ${w.ex.length?`<div class="gex">${w.ex.map(e=>`<div><span class="gz">${seg(e.zh)}</span><span class="gxp">${esc(e.py)}</span><span class="gv">${esc(e.vn)}</span></div>`).join('')}</div>`:''}</div>`).join('');
   } else {
     body = l.dlg.map((g,gi)=>`<div class="gtd"><div class="gth"><b>${esc(g.title)}</b><button class="pbtn sm" data-all="${gi}">▶ Nghe cả bài</button></div>
-      ${g.lines.map(x=>`<div class="dl gl ${x.s==='A'?'M':'F'}" data-k="${x.k}"><span class="sp">${esc(x.s)}</span><div class="dt"><div class="dz">${esc(x.zh)}</div><div class="dpy">${esc(x.py)}</div><div class="dvn">${esc(x.vn)}</div></div>${spk(x.k)}</div>`).join('')}</div>`).join('');
+      ${g.lines.map(x=>`<div class="dl gl ${x.s==='A'?'M':'F'}" data-k="${x.k}"><span class="sp">${esc(x.s)}</span><div class="dt"><div class="dz">${seg(x.zh)}</div><div class="dpy">${esc(x.py)}</div><div class="dvn">${esc(x.vn)}</div></div>${spk(x.k)}</div>`).join('')}</div>`).join('');
   }
   root().innerHTML = `<div class="qwrap">
-    <div class="qhead"><button class="qx" id="gtBack">←</button><div class="dtitle left">Bài ${l.n}: ${esc(l.zh)}<small>${esc(l.vn)}</small></div></div>
+    <div class="qhead"><button class="qx" id="gtBack">←</button><div class="dtitle left">HSK ${lvl} · Bài ${l.n}: ${esc(l.zh)}<small>${esc(l.vn)}</small></div></div>
+    <p class="qhint" style="margin:0 0 10px!important">👆 Chạm vào từ (kể cả từ gạch chân trong câu) để mở flashcard của từ đó.</p>
     <div class="seg" id="gtSeg"><button data-v="words" aria-pressed="${view==='words'}">Từ vựng (${l.words.length})</button><button data-v="dlg" aria-pressed="${view==='dlg'}">Hội thoại</button><button data-v="quiz">Luyện tập</button></div>
     <div style="margin-top:12px">${body}</div>
     <div class="btns"><button id="gtPrev" ${l.n>1?'':'disabled'}>← Bài ${l.n-1||''}</button><button class="pri" id="gtNext" ${l.n<GT.length?'':'disabled'}>Bài ${l.n<GT.length?l.n+1:''} →</button></div></div>`;
   $('#gtBack').onclick = list;
   $('#gtSeg').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; if(b.dataset.v==='quiz'){ const ks=new Set(l.words.map(w=>w.hk).filter(Boolean)); A.startCustomQuiz(W.filter(w=>ks.has('w'+w.n))); return; } view=b.dataset.v; lesson(); };
+  root().querySelectorAll('.prow.tap').forEach(el=>el.onclick=e=>{ if(e.target.closest('.spk')) return; jump(el.dataset.jw); });
+  root().querySelectorAll('.tw').forEach(el=>el.onclick=e=>{ e.stopPropagation(); jump(el.dataset.w); });
   root().querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>playAll(l.dlg[+b.dataset.all].lines.map(x=>x.k), b));
   $('#gtPrev').onclick = ()=>{ cur=GT[l.n-2]; lesson(); root().scrollTop=0; };
   $('#gtNext').onclick = ()=>{ cur=GT[l.n]; lesson(); root().scrollTop=0; };
@@ -1837,7 +1855,7 @@ function lesson(){
 }
 document.addEventListener('click', e=>{ if(e.target.closest('.spk')) sstop(); }, true);
 A.openGT = ()=>A.showTab('gt');
-A.onGtTab = ()=>{ if(!cur) list(); };
+A.onGtTab = ()=>{ const b=document.getElementById('backGt'); if(b) b.remove(); if(!cur) list(); };
 };
 
 </script>
