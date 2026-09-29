@@ -521,6 +521,20 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 .pw .pwe{grid-column:2;grid-row:2/4;font-size:22px;align-self:end}
 .pfoot{display:flex;justify-content:space-between;gap:10px;margin:6px 0 14px;font-family:'Dancing Script',cursive;font-size:19px;color:var(--ink);opacity:.85}
 .pfoot span:last-child{text-align:right}
+.gtl{display:flex;flex-direction:column;gap:8px}
+.gtb{display:flex;gap:12px;align-items:center;text-align:left;background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:10px 12px;cursor:pointer}
+.gtb .gn{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800}
+.gtb b{display:block;font-family:var(--hz);font-size:18px}.gtb small{display:block;font-size:13px}.gtb em{font-style:normal;font-size:12px;color:var(--blue);font-weight:600}
+.gtw{margin-bottom:8px}
+.gtw .prow{border-radius:14px 14px 0 0}
+.gtw .prow:last-child{border-radius:14px}
+.gpos{font-style:normal;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:1px 6px}
+.gex{background:var(--paper-2);border:1px solid var(--gold-soft);border-top:0;border-radius:0 0 14px 14px;padding:6px 12px 8px}
+.gex>div{display:flex;flex-direction:column;padding:5px 0;border-bottom:1px dashed var(--gold-soft)}.gex>div:last-child{border-bottom:0}
+.gex .gz{font-family:var(--hz);font-size:17px}.gex .gz b{color:var(--red)}.gex .gxp{font-family:var(--ui);font-size:12.5px;color:var(--red);text-align:left;font-weight:500}.gex .gv{font-size:13px;color:var(--muted)}
+.gtd{margin-bottom:14px}.gth{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.gth b{font-family:var(--hz);font-size:17px;color:var(--blue)}
+.gtd .dl{margin-bottom:6px}
+.gl.now{border-color:var(--red);background:var(--red-soft)}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -638,16 +652,16 @@ async function __boot(){
   const box = document.getElementById('boot');
   try{
     const IN = window.__INLINE;
-    const V = '?v=1790502247';
+    const V = '?v=1790690737';
     if(IN){ DATA=IN.data; STROKES=IN.strokes; DLGS=IN.dlg; Object.assign(AUDIO, IN.audio||{}); }
     else {
       const got = await Promise.all(['data.json','strokes.json','dialogs.json'].map(f=>fetch(f+V).then(r=>{ if(!r.ok) throw new Error(f); return r.json(); })));
       DATA=got[0]; STROKES=got[1]; DLGS=got[2];
       (DATA.akeys||[]).forEach(k=>{ if(!(k in AUDIO)) AUDIO[k]=true; });
     }
-    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad(); if(window.__pro) window.__pro(); if(window.__collo) window.__collo(); if(window.__collo2) window.__collo2();
+    window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad(); if(window.__pro) window.__pro(); if(window.__gt) window.__gt(); if(window.__collo) window.__collo(); if(window.__collo2) window.__collo2();
     if(box) box.remove();
-    if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json','ap.json'] : ['a1.json','ac.json','a2.json','ap.json'];
+    if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json','ap.json','ag.json'] : ['a1.json','ac.json','a2.json','ap.json','ag.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
   }catch(e){ if(box) box.innerHTML = '<p>Không tải được dữ liệu. Bạn kiểm tra mạng rồi tải lại trang nhé.</p>'; }
 }
@@ -1769,6 +1783,54 @@ A.colPoster = poster;
 };
 
 </script>
+<script>window.__gt = function(){
+const A = window.APP; if(!A) return;
+const {W, esc, cap, SPK} = A;
+const GT = (window.DATA && DATA.gt) || [];
+const $ = s => document.querySelector(s);
+const root = () => $('#prov');
+const spk = k => (k && A.AUDIO && A.AUDIO[k]) ? `<button class="spk sm" data-audio="${k}" aria-label="Nghe">${SPK}</button>` : '';
+let cur = null, view = 'words';
+let sq = {a:null, keys:[], i:0, btn:null};
+function sstop(){ if(sq.a) sq.a.pause(); if(sq.btn) sq.btn.classList.remove('playing'); sq.btn=null; document.querySelectorAll('.gl.now').forEach(x=>x.classList.remove('now')); }
+function sstep(){ document.querySelectorAll('.gl.now').forEach(x=>x.classList.remove('now')); if(sq.i>=sq.keys.length){ sstop(); return; } const k=sq.keys[sq.i]; if(typeof A.AUDIO[k]!=='string'){ sstop(); A.toast('Âm thanh đang tải, bạn thử lại sau vài giây nhé.'); return; } const el=document.querySelector(`.gl[data-k="${k}"]`); if(el) el.classList.add('now'); sq.a.src='data:audio/mpeg;base64,'+A.AUDIO[k]; const p=sq.a.play(); if(p&&p.catch) p.catch(()=>sstop()); }
+function playAll(keys, btn){ if(sq.btn===btn){ sstop(); return; } A.stopSpeak(); sstop(); if(!sq.a){ sq.a=new Audio(); sq.a.addEventListener('ended',()=>{ sq.i++; setTimeout(sstep,350); }); } sq.keys=keys; sq.i=0; sq.btn=btn; btn.classList.add('playing'); sstep(); }
+function list(){
+  sstop();
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="gtBack">←</button><div class="dtitle left">📘 Giáo trình HSK 1<small>15 bài · từ vựng, ví dụ và hội thoại theo giáo trình</small></div></div>
+    <div class="gtl">${GT.map((l,i)=>`<button class="gtb" data-i="${i}"><span class="gn">${l.n}</span><div><b>${esc(l.zh)}</b><small>${esc(l.vn)}</small><em>${l.words.length} từ · ${l.dlg.length} hội thoại</em></div></button>`).join('')}</div></div>`;
+  $('#gtBack').onclick = ()=>A.proHome();
+  root().querySelectorAll('.gtb').forEach(b=>b.onclick=()=>{ cur=GT[+b.dataset.i]; view='words'; lesson(); });
+  root().scrollTop=0;
+}
+function lesson(){
+  A.stopSpeak(); sstop();
+  const l = cur; let body='';
+  if(view==='words'){
+    body = l.words.map(w=>`<div class="gtw"><div class="prow"><span class="phz">${esc(w.w)}</span><div class="pinf"><b>${esc(w.py)}</b><span>${w.pos?`<i class="gpos">${esc(w.pos)}</i> `:''}${esc(cap(w.vn))}</span></div>${spk(w.hk||w.ak)}</div>
+      ${w.ex.length?`<div class="gex">${w.ex.map(e=>`<div><span class="gz">${esc(e.zh).split(esc(w.w.replace(/（.*）/,''))).join('<b>'+esc(w.w.replace(/（.*）/,''))+'</b>')}</span><span class="gxp">${esc(e.py)}</span><span class="gv">${esc(e.vn)}</span></div>`).join('')}</div>`:''}</div>`).join('');
+  } else {
+    body = l.dlg.map((g,gi)=>`<div class="gtd"><div class="gth"><b>${esc(g.title)}</b><button class="pbtn sm" data-all="${gi}">▶ Nghe cả bài</button></div>
+      ${g.lines.map(x=>`<div class="dl gl ${x.s==='A'?'M':'F'}" data-k="${x.k}"><span class="sp">${esc(x.s)}</span><div class="dt"><div class="dz">${esc(x.zh)}</div><div class="dpy">${esc(x.py)}</div><div class="dvn">${esc(x.vn)}</div></div>${spk(x.k)}</div>`).join('')}</div>`).join('');
+  }
+  root().innerHTML = `<div class="qwrap">
+    <div class="qhead"><button class="qx" id="gtBack">←</button><div class="dtitle left">Bài ${l.n}: ${esc(l.zh)}<small>${esc(l.vn)}</small></div></div>
+    <div class="seg" id="gtSeg"><button data-v="words" aria-pressed="${view==='words'}">Từ vựng (${l.words.length})</button><button data-v="dlg" aria-pressed="${view==='dlg'}">Hội thoại</button><button data-v="quiz">Luyện tập</button></div>
+    <div style="margin-top:12px">${body}</div>
+    <div class="btns"><button id="gtPrev" ${l.n>1?'':'disabled'}>← Bài ${l.n-1||''}</button><button class="pri" id="gtNext" ${l.n<GT.length?'':'disabled'}>Bài ${l.n<GT.length?l.n+1:''} →</button></div></div>`;
+  $('#gtBack').onclick = list;
+  $('#gtSeg').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; if(b.dataset.v==='quiz'){ const ks=new Set(l.words.map(w=>w.hk).filter(Boolean)); A.startCustomQuiz(W.filter(w=>ks.has('w'+w.n))); return; } view=b.dataset.v; lesson(); };
+  root().querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>playAll(l.dlg[+b.dataset.all].lines.map(x=>x.k), b));
+  $('#gtPrev').onclick = ()=>{ cur=GT[l.n-2]; lesson(); root().scrollTop=0; };
+  $('#gtNext').onclick = ()=>{ cur=GT[l.n]; lesson(); root().scrollTop=0; };
+  root().scrollTop=0;
+}
+document.addEventListener('click', e=>{ if(e.target.closest('.spk')) sstop(); }, true);
+A.openGT = list;
+};
+
+</script>
 <script>window.__pro = function(){
 const A = window.APP; if(!A) return;
 const {W, esc, cap, SPK} = A;
@@ -1784,8 +1846,10 @@ function home(){
   A.stopSpeak();
   root().innerHTML = `<div class="qwrap"><h2 class="qt">Học theo chuyên ngành</h2>
     <p class="qhint" style="margin-top:-8px!important">Từ vựng chuyên ngành và mẫu câu thường gặp trong công việc, kèm phát âm và bài luyện tập.</p>
+    <button class="songbtn gtbtn" id="gtOpen"><span>📘</span><div><b>Giáo trình HSK 1 <em class="pzh">15 bài</em></b><small>Từ vựng, ví dụ và hội thoại theo giáo trình, bài 1 đến bài 15</small></div></button>
     ${PRO.map((d,i)=>`<button class="songbtn" data-i="${i}"><span>${d.emo}</span><div><b>${esc(d.vn)} <em class="pzh">${esc(d.zh)}</em></b><small>${esc(d.desc)}</small><small class="pct">${d.words.length} từ vựng · ${d.sents.length} mẫu câu</small></div></button>`).join('')}</div>`;
-  root().querySelectorAll('.songbtn').forEach(b=>b.onclick=()=>{ cur = PRO[+b.dataset.i]; view='words'; domain(); });
+  root().querySelectorAll('.songbtn[data-i]').forEach(b=>b.onclick=()=>{ cur = PRO[+b.dataset.i]; view='words'; domain(); });
+  $('#gtOpen').onclick = ()=>A.openGT && A.openGT();
   root().scrollTop = 0;
 }
 function hl(zh){
@@ -1859,6 +1923,7 @@ function qEnd(){
   $('#pqWords').onclick = ()=>{ view='words'; domain(); };
 }
 A.onProTab = ()=>{ if(!cur) home(); };
+A.proHome = ()=>{ cur=null; home(); };
 };
 
 </script>
