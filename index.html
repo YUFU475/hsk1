@@ -551,6 +551,18 @@ body{background:radial-gradient(120% 60% at 50% -10%, var(--paper-2), var(--pape
 body:not([data-tab="cards"]) .backgt{display:none}
 .gexr{position:relative;padding-right:40px!important}
 .gexr .spk{position:absolute;right:0;top:8px}
+.tw.td{background:#FFF4E5;border-color:rgba(214,140,40,.35)}
+:root[data-theme="dark"] .tw.td{background:#3a2e1c}
+.dsheet{max-height:88%}
+.dtop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.dwz{font-family:var(--hz);font-size:44px;font-weight:800;line-height:1.1}
+.dpy2{color:var(--red);font-weight:700;font-size:18px}.dhv{font-size:14px;color:var(--muted)}.dhv b{color:var(--ink)}
+.dvn2{font-size:17px;font-weight:700;margin:8px 0}
+.den{margin:8px 0;font-size:14px;line-height:1.5}.den i{font-style:normal;color:var(--red);font-weight:600;margin-right:4px}
+.dch{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--gold-soft)}
+.dcw{width:76px;height:76px;flex:none;border:1.5px solid var(--gold);border-radius:8px;background:var(--paper);display:grid;place-items:center;font-family:var(--hz);font-size:44px;cursor:pointer}
+.dci{flex:1;min-width:0;font-size:14px;line-height:1.4}.dci b{font-family:var(--hz);font-size:20px}.dci i{font-style:normal;color:var(--red);font-weight:600}.dci small{display:block;color:var(--muted);font-size:12.5px}
+.dci .dj{margin-top:5px;font-size:14px;height:auto;padding:3px 8px}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -1809,9 +1821,9 @@ const SETS = {1:(window.DATA && DATA.gt) || [], 2:(window.DATA && DATA.gt2) || [
 let lvl = A.store.get('gtLv', 1); let GT = SETS[lvl];
 const DICT = {}; W.forEach(w=>{ if(!DICT[w.w]) DICT[w.w]=w; });
 const MAXL = 4;
-function seg(s){ const ch=[...s]; let out='', i=0; while(i<ch.length){ let hit=null; for(let L=Math.min(MAXL,ch.length-i); L>=1; L--){ const t=ch.slice(i,i+L).join(''); if(DICT[t]){ hit=t; break; } } if(hit){ out+=`<span class="tw" data-w="${esc(hit)}">${esc(hit)}</span>`; i+=[...hit].length; } else { out+=esc(ch[i]); i++; } } return out; }
+function seg(s){ const ch=[...s]; let out='', i=0; while(i<ch.length){ let hit=null; for(let L=Math.min(MAXL,ch.length-i); L>=1; L--){ const t=ch.slice(i,i+L).join(''); if(DICT[t] || (window.DATA && DATA.gtd && DATA.gtd[t])){ hit=t; break; } } if(hit){ out+=`<span class="tw${DICT[hit]?'':' td'}" data-w="${esc(hit)}">${esc(hit)}</span>`; i+=[...hit].length; } else { out+=esc(ch[i]); i++; } } return out; }
 function bestWord(w){ if(DICT[w]) return w; const ch=[...w]; for(let L=ch.length-1; L>=1; L--) for(let i=0;i+L<=ch.length;i++){ const t=ch.slice(i,i+L).join(''); if(DICT[t]) return t; } return null; }
-function jump(w){ const b = bestWord(w); if(!b){ A.toast('Từ này chưa có thẻ trong 500 từ HSK 1–2.'); return; } showBack(); A.jumpToChar(b); }
+function jump(w){ if(!DICT[w] && A.openDictWord){ showBack(); A.openDictWord(w); return; } const b = bestWord(w); if(!b){ A.toast('Từ này chưa có thẻ trong 500 từ HSK 1–2.'); return; } showBack(); A.jumpToChar(b); }
 function showBack(){ let el=document.getElementById('backGt'); if(!el){ el=document.createElement('button'); el.id='backGt'; el.className='backgt'; el.textContent='← Về giáo trình'; el.onclick=()=>{ el.remove(); A.showTab('gt'); }; document.body.appendChild(el); } }
 const $ = s => document.querySelector(s);
 const root = () => $('#gtv');
@@ -2529,6 +2541,78 @@ A.onHzTab = ()=>render();
 if(A.onLevel) A.onLevel(()=>{ if(document.body.dataset.tab==='hz') render(); });
 };
 
+</script>
+<script>(function(){
+function init(){
+const A = window.APP; if(!A || A.openDictWord) return;
+const $ = s => document.querySelector(s);
+const esc = A.esc, cap = A.cap;
+const HSK = {}; A.W.forEach(w=>{ if(!HSK[w.w]) HSK[w.w]=w; });
+const GTD = (window.DATA && DATA.gtd) || {};
+let D = null, loading = null;
+const TM={a:'āáǎà',e:'ēéěè',i:'īíǐì',o:'ōóǒò',u:'ūúǔù',v:'ǖǘǚǜ'};
+function mark(s){ return (s||'').split(' ').map(x=>{ const m=x.match(/^([a-zv]+)([1-5])$/); if(!m) return x; let b=m[1], t=+m[2]; if(t===5) return b.replace(/v/g,'ü'); let i = b.includes('a')?b.indexOf('a'): b.includes('e')?b.indexOf('e'): b.includes('ou')?b.indexOf('o'): Math.max(...'iouv'.split('').map(v=>b.lastIndexOf(v))); if(i<0) return b; return (b.slice(0,i)+TM[b[i]][t-1]+b.slice(i+1)).replace(/v/g,'ü'); }).join(''); }
+function load(){ if(D) return Promise.resolve(D); if(!loading) loading = fetch('dict.json?v=1').then(r=>r.json()).then(j=>{ D=j; return D; }); return loading; }
+function hvOf(word, py){ const ps=(py||'').split(' '); return [...word].map((c,i)=>{ if(A.C[c]) return A.C[c].hv; const m = D && D.hv[c]; if(!m) return ''; return m[ps[i]] || m['*'] || Object.values(m)[0] || ''; }).join(' '); }
+function recs(word){ const raw = (D && D.w[word]) || GTD[word]; if(!raw) return []; return raw.split('¦').map(r=>{ const [p,g]=r.split('|'); return {p, g}; }); }
+function say(text, btn){ const w = HSK[text]; if(w && A.AUDIO && typeof A.AUDIO['w'+w.n]==='string'){ A.speak('w'+w.n, btn); return; }
+  if(!('speechSynthesis' in window)){ A.toast('Trình duyệt chưa hỗ trợ đọc từ này.'); return; }
+  speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; const v = speechSynthesis.getVoices().find(v=>/^zh[-_]CN/i.test(v.lang)); if(v) u.voice=v; u.rate=0.85; speechSynthesis.speak(u); }
+const TYPE = {p:'Hình thanh', i:'Hội ý', '':''};
+function sheet(){ let s=$('#sheetDict'); if(!s){ s=document.createElement('div'); s.className='sheet dsheet'; s.id='sheetDict'; s.setAttribute('role','dialog'); document.body.appendChild(s); $('#scrim').addEventListener('click',()=>s.classList.remove('open')); } return s; }
+function open(html){ const s=sheet(); s.innerHTML='<div class="grab"></div>'+html; $('#scrim').classList.add('open'); s.classList.add('open'); return s; }
+function close(){ const s=$('#sheetDict'); if(s) s.classList.remove('open'); $('#scrim').classList.remove('open'); }
+function wordCard(word){
+  const h = HSK[word];
+  const s = open(`<div class="dcard" id="dCard"><div class="dwz">${esc(word)}</div><p class="qhint">Đang tải từ điển…</p></div>`);
+  load().then(()=>{
+    const rs = recs(word);
+    const py = h ? h.py : (rs[0] ? mark(rs[0].p) : '');
+    const hv = cap(hvOf(word, rs[0] ? rs[0].p : ''));
+    const chars = [...new Set([...word])].filter(c=>/[\u3400-\u9fff]/.test(c));
+    s.querySelector('#dCard').innerHTML = `
+      <div class="dtop"><div><div class="dwz">${esc(word)}</div><div class="dpy2">${esc(py)}</div><div class="dhv">Hán Việt: <b>${esc(hv)}</b></div></div><button class="spk" id="dSay" aria-label="Nghe">${A.SPK}</button></div>
+      ${h ? `<div class="dvn2"><span class="lvb l${h.lv||1}">HSK ${h.lv||1}</span> ${esc(cap(h.vn))}</div>` : ''}
+      ${rs.length ? `<div class="den">${rs.map(r=>`<div><i>${esc(mark(r.p))}</i> ${esc(r.g)}</div>`).join('')}</div>` : (h?'':'<p class="qhint">Chưa có trong từ điển.</p>')}
+      ${h ? `<button class="qstart" id="dFc">Mở flashcard của từ này</button>` : ''}
+      <div class="lysub">Phân tích từng chữ</div>
+      ${chars.map((c,i)=>{ const ci = D.c[c] || []; const hc = A.C[c]; const cr = recs(c)[0];
+        const rad = hc ? hc.rad : (ci[0]||''); const typ = hc ? hc.type : TYPE[ci[2]||''] || '';
+        const parts = hc && hc.sem ? `chỉ nghĩa ${hc.sem}${hc.pho?' + gợi âm '+hc.pho:''}` : (ci[3] ? `chỉ nghĩa ${ci[3]}${ci[4]?' + gợi âm '+ci[4]:''}` : (ci[1] && ci[1].length<=4 ? 'cấu tạo '+ci[1] : ''));
+        return `<div class="dch"><div class="dcw" data-c="${c}" id="dw${i}"></div><div class="dci"><b>${c}</b> <i>${esc(cr?mark(cr.p):'')}</i> · ${esc(cap(hvOf(c, cr?cr.p:'')))}<small>${esc(hc ? hc.vn : (cr ? cr.g : ''))}</small><small>${rad?`Bộ ${esc(rad)}`:''}${typ?` · ${esc(typ)}`:''}${parts?` · ${esc(parts)}`:''}</small>${HSK[c] && c!==word ? `<button class="fchip dj" data-w="${c}">${c} → flashcard</button>`:''}</div></div>`; }).join('')}
+    `;
+    chars.forEach((c,i)=>{ const el = s.querySelector('#dw'+i); try{ const wr = HanziWriter.create(el, c, {width:76,height:76,padding:4,showOutline:true,strokeColor:getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(),radicalColor:'#3D6E8C',charDataLoader:(ch,done)=>{ if(A.STROKES[ch]) done(A.STROKES[ch]); else fetch('https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/'+encodeURIComponent(ch)+'.json').then(r=>r.json()).then(done).catch(()=>{ el.textContent=ch; }); }}); el.onclick=()=>wr.animateCharacter(); }catch(e){ el.textContent=c; } });
+    s.querySelector('#dSay').onclick = e=>say(word, e.currentTarget);
+    const fc = s.querySelector('#dFc'); if(fc) fc.onclick = ()=>{ close(); A.jumpToChar(word); };
+    s.querySelectorAll('.dj').forEach(b=>b.onclick=()=>{ close(); A.jumpToChar(b.dataset.w); });
+  }).catch(()=>{ s.querySelector('#dCard').innerHTML='<p class="qhint">Không tải được từ điển, bạn kiểm tra mạng nhé.</p>'; });
+}
+const fold = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[\s'1-5]/g,'');
+let idx = null;
+function buildIdx(){ if(idx) return idx; idx = Object.keys(D.w).map(k=>{ const r = D.w[k].split('¦')[0].split('|'); return [k, fold(r[0]), fold(hvOf(k, r[0])), (r[1]||'').toLowerCase()]; }); return idx; }
+function search(){
+  const s = open(`<h2>Từ điển chữ Hán</h2><input class="search" id="dq" type="search" placeholder="Gõ chữ Hán, pinyin, Hán Việt hoặc nghĩa…" autocomplete="off"><div class="list" id="dres"><p class="qhint">Đang tải từ điển (khoảng 110.000 từ)…</p></div>`);
+  const inp = s.querySelector('#dq'); setTimeout(()=>inp.focus(),100);
+  load().then(()=>{ buildIdx(); s.querySelector('#dres').innerHTML='<p class="qhint">Tra được mọi chữ Hán và từ ghép. Ví dụ: 楼, lou, lâu, building.</p>'; inp.oninput = ()=>run(inp.value.trim()); if(inp.value) run(inp.value.trim()); });
+  function run(q){
+    const out = s.querySelector('#dres'); if(!q){ out.innerHTML=''; return; }
+    const han = /[\u3400-\u9fff]/.test(q); const f = fold(q); const ql=q.toLowerCase(); const res=[];
+    if(han){ if(D.w[q]) res.push(q); for(const r of idx){ if(res.length>=80) break; if(r[0]!==q && r[0].includes(q)) res.push(r[0]); } }
+    else { const a=[],b=[],c=[]; for(const r of idx){ if(r[1]===f||r[2]===f) a.push(r[0]); else if(r[1].startsWith(f)||r[2].startsWith(f)) b.push(r[0]); else if(ql.length>2 && r[3].includes(ql)) c.push(r[0]); if(a.length>40&&b.length>40) break; }
+      A.W.forEach(w=>{ if(fold(w.vn).includes(f) && !a.includes(w.w)) a.unshift(w.w); }); const hs=x=>HSK[x]?0:1; a.sort((x,y)=>hs(x)-hs(y)||x.length-y.length); b.sort((x,y)=>hs(x)-hs(y)||x.length-y.length); res.push(...a.slice(0,50),...b.slice(0,40),...c.slice(0,30)); }
+    const seen=new Set(); const rows=res.filter(w=>!seen.has(w)&&seen.add(w)).slice(0,100).map(w=>{ const r=(D.w[w]||'').split('¦')[0].split('|'); const h=HSK[w];
+      return `<button class="item" data-w="${esc(w)}"><span class="n">${h?`<span class="lvb l${h.lv||1}">H${h.lv||1}</span>`:''}</span><span class="hz">${esc(w)}</span><span class="d"><span>${esc(h?h.py:mark(r[0]||''))}</span><em>${esc(h?cap(h.vn):(r[1]||''))}</em><em>${esc(cap(hvOf(w,r[0]||'')))}</em></span><i></i></button>`; });
+    out.innerHTML = rows.join('') || '<div class="empty">Không tìm thấy.</div>';
+    out.querySelectorAll('.item').forEach(b=>b.onclick=()=>wordCard(b.dataset.w));
+  }
+}
+A.openDictWord = wordCard; A.openDict = search;
+// button on level row (all tabs)
+const row = document.querySelector('.lvrow'); const setBtn = document.getElementById('btnSet');
+if(row && !document.getElementById('btnDict')){ const b=document.createElement('button'); b.className='icon-btn sm txt'; b.id='btnDict'; b.innerHTML='<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Từ điển</span>'; b.onclick=search; row.insertBefore(b, setBtn); }
+}
+const t = setInterval(()=>{ if(window.APP){ clearInterval(t); init(); } }, 200);
+})();
 </script>
 </body>
 </html>
