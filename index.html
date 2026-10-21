@@ -566,6 +566,22 @@ body:not([data-tab="cards"]) .backgt{display:none}
 .pw .pwpos{grid-column:1/3;justify-self:start;font-size:10.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:1px 6px;margin-top:3px}
 .pw.px{border-style:dashed;border-color:#E2A04A}
 .pw .pxtag{position:absolute;top:6px;right:6px;font-size:9.5px;font-weight:700;color:#B26A00;background:#FFF1DC;border-radius:5px;padding:0 5px}
+.ctnav{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}.ctnav a{font-size:12.5px;font-weight:600;color:var(--blue);background:var(--blue-soft);border-radius:14px;padding:5px 10px;text-decoration:none}
+.ctdeck{margin-bottom:16px;scroll-margin-top:10px}
+.cth{display:flex;gap:10px;align-items:center;margin:6px 0 8px}.cth span{font-size:28px}.cth b{font-size:16px}.cth small{display:block;color:var(--muted);font-size:12.5px}
+.ctc{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:10px 12px;margin-bottom:8px;box-shadow:0 8px 20px -18px rgba(120,95,60,.6)}
+.ctz{flex:none;width:68px;border:2px solid #E86A9A;border-radius:14px;background:var(--paper);display:flex;flex-direction:column;align-items:center;padding:6px 0 4px;cursor:pointer}
+.ctz span{font-family:var(--hz);font-size:40px;font-weight:800;line-height:1.1}.ctz em{margin:2px 0 0;font-style:normal}
+.ctt{flex:1;min-width:0}
+.ctf{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-family:var(--hz);font-size:19px;font-weight:700}
+.ctf span{background:var(--red-soft);color:var(--red);border-radius:8px;padding:1px 7px}.ctf span.ctr{background:var(--red);color:#fff}
+.ctf i{font-style:normal;color:var(--muted);font-family:var(--ui);font-size:15px}
+.ctf .spk{margin-left:auto}
+.ctt p{margin:6px 0 0;font-size:14.5px;line-height:1.5}
+.ctc.covered .ctz span,.ctc.covered .ctr{filter:blur(7px)}
+.ctbox{width:100%;background:#FFF4E5;border:1px solid rgba(214,140,40,.35);border-radius:10px;padding:7px 9px;margin:2px 0 4px;color:var(--ink);font-size:13px;line-height:1.45}
+.ctbox b{display:block;color:#B26A00;font-family:var(--hz)}
+:root[data-theme="dark"] .ctbox{background:#3a2e1c}
 .empty{height:12px}
 .lyt{color:var(--ink)}
 .lyw{font:inherit;border:0;background:none;padding:0 1px;margin:0 2px;cursor:pointer;border-bottom:2px solid;line-height:1.2}
@@ -765,6 +781,7 @@ Object.entries(C).forEach(([c,d])=>{
 GROUPS.cpy = CPY;
 function famChips(c){
   const d = C[c]; const out = [];
+  { const CTM = window.__CTM || (window.__CTM = (()=>{ const m={}; ((window.DATA&&DATA.ct)||[]).forEach(dk=>dk.items.forEach(it=>{ m[it[0]]=it; })); return m; })()); const it = CTM[c]; if(it) out.push(`<div class="ctbox"><b>💡 Chiết tự: ${esc(it[1])}</b><span>${esc(it[2])}</span></div>`); }
   const chip = x => `<button class="fchip" data-jc="${x}">${x}</button>`;
   if(d.type==='Hình thanh'){
     if(d.pho && d.pho!==d.sem){ const g = (GROUPS.pho[d.pho]||[]).filter(x=>x!==c); const base = C[d.pho] && d.pho!==c ? [d.pho] : []; const all = base.concat(g); if(all.length) out.push(`<div class="fam"><span>Cùng phần gợi âm <b class="r">${d.pho}</b>:</span>${all.slice(0,8).map(chip).join('')}</div>`); }
@@ -2456,7 +2473,7 @@ const TYPES = [
   {id:'Chỉ sự', short:'Chỉ sự', desc:'Dùng nét hoặc dấu để chỉ ý trừu tượng, ví dụ 上, 下, 一, 二, 三.'}
 ];
 let st = Object.assign({type:'Hình thanh', by:'sem', view:'cls'}, A.store.get('hzView', {}));
-A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="col" aria-pressed="${v==='col'}">Học theo từ ghép</button></div>`;
+A.hzSwitch = v => `<div class="seg hzsw" id="hzSw"><button data-v="ct" aria-pressed="${v==='ct'}">Chiết tự vui</button><button data-v="cls" aria-pressed="${v==='cls'}">Phân loại chữ</button><button data-v="col" aria-pressed="${v==='col'}">Học theo từ ghép</button></div>`;
 A.hzWire = ()=>wireSw(); A.hzWireSw = ()=>wireSw();
 function wireSw(){ const s = $('#hzSw'); if(s) s.onclick = e=>{ const b=e.target.closest('button'); if(!b) return; st.view=b.dataset.v; save(); render(); }; }
 const save = ()=>A.store.set('hzView', st);
@@ -2495,6 +2512,7 @@ function practiceBtn(chars){ return `<button class="gprac" data-chars="${chars.j
 const LVc = c => { const L = A.level ? A.level() : 'all'; return L==='all' || String(C[c].lv||1)===L; };
 function render(){
   if(st.view==='col' && A.colList){ A.colList(); return; }
+  if(st.view==='ct' && A.ctList){ A.ctList(); return; }
   const all = Object.keys(C).filter(LVc);
   const G = { sem:{}, pho:{} }; Object.entries(GROUPS.sem).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.sem[k]=f; }); Object.entries(GROUPS.pho).forEach(([k,v])=>{ const f=v.filter(LVc); if(f.length) G.pho[k]=f; });
   const counts = Object.fromEntries(TYPES.map(t=>[t.id, all.filter(c=>C[c].type===t.id).length]));
@@ -2617,6 +2635,35 @@ A.openDictWord = wordCard; A.openDict = search;
 // button on level row (all tabs)
 const row = document.querySelector('.lvrow'); const setBtn = document.getElementById('btnSet');
 if(row && !document.getElementById('btnDict')){ const b=document.createElement('button'); b.className='icon-btn sm txt'; b.id='btnDict'; b.innerHTML='<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Từ điển</span>'; b.onclick=search; row.insertBefore(b, setBtn); }
+}
+const t = setInterval(()=>{ if(window.APP){ clearInterval(t); init(); } }, 200);
+})();
+</script>
+<script>
+(function(){
+function init(){
+const A = window.APP; if(!A || A.ctList) return;
+const $ = s => document.querySelector(s); const esc=A.esc;
+const root = () => $('#hzv');
+let cover = A.store.get('ctCover', false);
+function list(){
+  const D = (window.DATA && DATA.ct) || [];
+  root().innerHTML = `<div class="qwrap">${A.hzSwitch('ct')}
+    <h2 class="qt">Chiết tự vui</h2>
+    <p class="qhint" style="margin-top:-8px!important">Tách chữ thành các phần quen thuộc rồi ghép lại thành một câu chuyện nhỏ, nhìn chữ là nhớ nghĩa. Chạm vào chữ để mở flashcard.</p>
+    <div class="dctl" style="justify-content:flex-start"><button class="pbtn ghost sm${cover?' on':''}" id="ctCover">${cover?'Đang che chữ, chạm để hiện':'Tự kiểm tra: che chữ'}</button></div>
+    <div class="ctnav">${D.map((dk,i)=>`<a href="#" data-i="${i}">${dk.emo} ${esc(dk.t.replace('Chữ có ',''))}</a>`).join('')}</div>
+    ${D.map((dk,i)=>`<div class="ctdeck" id="ctd${i}"><div class="cth"><span>${dk.emo}</span><div><b>${esc(dk.t)}</b><small>${esc(dk.e)}</small></div></div>
+      ${dk.items.map(it=>{ const w = A.C[it[0]]; const lv = w ? (w.lv||1) : 0; return `<div class="ctc${cover?' covered':''}"><button class="ctz" data-c="${esc(it[0])}"><span>${esc(it[0])}</span>${lv?`<em class="lvb l${lv}">HSK ${lv}</em>`:''}</button><div class="ctt"><div class="ctf">${it[1].split('+').map(p=>`<span>${esc(p.trim())}</span>`).join('<i>+</i>')}<i>=</i><span class="ctr">${esc(it[0])}</span>${A.pbtn ? A.pbtn(it[0]) : ''}</div><p>${esc(it[2])}</p></div></div>`; }).join('')}
+    </div>`).join('')}
+  </div>`;
+  A.hzWireSw && A.hzWireSw();
+  root().querySelectorAll('.ctz').forEach(b=>b.onclick=()=>{ const card=b.closest('.ctc'); if(card.classList.contains('covered')){ card.classList.remove('covered'); return; } A.jumpToChar(b.dataset.c); });
+  root().querySelectorAll('.ctc.covered .ctr').forEach(x=>x.onclick=()=>x.closest('.ctc').classList.remove('covered'));
+  $('#ctCover').onclick = ()=>{ cover=!cover; A.store.set('ctCover',cover); list(); };
+  root().querySelectorAll('.ctnav a').forEach(a=>a.onclick=e=>{ e.preventDefault(); const el=$('#ctd'+a.dataset.i); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); });
+}
+A.ctList = list;
 }
 const t = setInterval(()=>{ if(window.APP){ clearInterval(t); init(); } }, 200);
 })();
