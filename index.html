@@ -709,7 +709,7 @@ async function __boot(){
     }
     window.__main(); if(window.__quiz) window.__quiz(); if(window.__hz) window.__hz(); if(window.__songs) window.__songs(); if(window.__write) window.__write(); if(window.__rad) window.__rad(); if(window.__pro) window.__pro(); if(window.__gt) window.__gt(); if(window.__collo) window.__collo(); if(window.__collo2) window.__collo2();
     if(box) box.remove();
-    if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json','ap.json','ag.json','ax.json'] : ['a1.json','ac.json','a2.json','ap.json','ag.json','ax.json'];
+    if(!IN){ const order = (window.APP && window.APP.level && window.APP.level()==='2') ? ['a2.json','a1.json','ac.json','ap.json','ag.json','ax.json','aw.json'] : ['a1.json','ac.json','a2.json','ap.json','ag.json','ax.json','aw.json'];
       for(const f of order){ try{ const o = await fetch(f+V).then(r=>r.json()); Object.assign(AUDIO,o); }catch(e){} } }
   }catch(e){ if(box) box.innerHTML = '<p>Không tải được dữ liệu. Bạn kiểm tra mạng rồi tải lại trang nhé.</p>'; }
 }
@@ -2581,6 +2581,7 @@ function load(){ if(D) return Promise.resolve(D); if(!loading) loading = fetch('
 function hvOf(word, py){ const ps=(py||'').split(' '); return [...word].map((c,i)=>{ if(A.C[c]) return A.C[c].hv; const m = D && D.hv[c]; if(!m) return ''; return m[ps[i]] || m['*'] || Object.values(m)[0] || ''; }).join(' '); }
 function recs(word){ const raw = (D && D.w[word]) || GTD[word]; if(!raw) return []; return raw.split('¦').map(r=>{ const [p,g]=r.split('|'); return {p, g}; }); }
 function say(text, btn){ const w = HSK[text]; if(w && A.AUDIO && typeof A.AUDIO['w'+w.n]==='string'){ A.speak('w'+w.n, btn); return; }
+  const dk = window.DATA && DATA.dxk && DATA.dxk[text]; if(dk && A.AUDIO && A.AUDIO[dk]){ A.speak(dk, btn); return; }
   if(!('speechSynthesis' in window)){ A.toast('Trình duyệt chưa hỗ trợ đọc từ này.'); return; }
   speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; const v = speechSynthesis.getVoices().find(v=>/^zh[-_]CN/i.test(v.lang)); if(v) u.voice=v; u.rate=0.85; speechSynthesis.speak(u); }
 const TYPE = {p:'Hình thanh', i:'Hội ý', '':''};
@@ -2596,7 +2597,7 @@ function wordCard(word){
     const hv = cap(hvOf(word, rs[0] ? rs[0].p : ''));
     const chars = [...new Set([...word])].filter(c=>/[\u3400-\u9fff]/.test(c));
     s.querySelector('#dCard').innerHTML = `
-      <div class="dtop"><div><div class="dwz">${esc(word)}</div><div class="dpy2">${esc(py)}</div><div class="dhv">Hán Việt: <b>${esc(hv)}</b></div></div><button class="spk" id="dSay" aria-label="Nghe">${A.SPK}</button></div>
+      <div class="dtop"><div><div class="dwz">${esc(word)}</div><div class="dpy2">${esc(py)}</div><div class="dhv">Hán Việt: <b>${esc(hv)}</b></div></div>${(()=>{ const ak = h ? ('w'+h.n) : ((window.DATA&&DATA.dxk)||{})[word]; return ak ? `<button class="spk" data-audio="${ak}" aria-label="Nghe">${A.SPK}</button>` : `<button class="pbtn ghost sm" id="dSay">🔊 Nghe</button>`; })()}</div>
       ${h ? `<div class="dvn2"><span class="lvb l${h.lv||1}">HSK ${h.lv||1}</span> ${esc(cap(h.vn))}</div>` : ''}
       ${rs.length ? `<div class="den">${rs.map(r=>`<div><i>${esc(mark(r.p))}</i> ${esc(r.g)}</div>`).join('')}</div>` : (h?'':'<p class="qhint">Chưa có trong từ điển.</p>')}
       ${h ? `<button class="qstart" id="dFc">Mở flashcard của từ này</button>` : ''}
@@ -2607,7 +2608,7 @@ function wordCard(word){
         return `<div class="dch"><div class="dcw" data-c="${c}" id="dw${i}"></div><div class="dci"><b>${c}</b> <i>${esc(cr?mark(cr.p):'')}</i> · ${esc(cap(hvOf(c, cr?cr.p:'')))}<small>${esc(hc ? hc.vn : (cr ? cr.g : ''))}</small><small>${rad?`Bộ ${esc(rad)}`:''}${typ?` · ${esc(typ)}`:''}${parts?` · ${esc(parts)}`:''}</small>${HSK[c] && c!==word ? `<button class="fchip dj" data-w="${c}">${c} → flashcard</button>`:''}</div></div>`; }).join('')}
     `;
     chars.forEach((c,i)=>{ const el = s.querySelector('#dw'+i); try{ const wr = HanziWriter.create(el, c, {width:76,height:76,padding:4,showOutline:true,strokeColor:getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(),radicalColor:'#3D6E8C',charDataLoader:(ch,done)=>{ if(A.STROKES[ch]) done(A.STROKES[ch]); else fetch('https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/'+encodeURIComponent(ch)+'.json').then(r=>r.json()).then(done).catch(()=>{ el.textContent=ch; }); }}); el.onclick=()=>wr.animateCharacter(); }catch(e){ el.textContent=c; } });
-    s.querySelector('#dSay').onclick = e=>say(word, e.currentTarget);
+    const ds = s.querySelector('#dSay'); if(ds) ds.onclick = e=>say(word, e.currentTarget);
     const fc = s.querySelector('#dFc'); if(fc) fc.onclick = ()=>{ close(); A.jumpToChar(word); };
     s.querySelectorAll('.dj').forEach(b=>b.onclick=()=>{ close(); A.jumpToChar(b.dataset.w); });
   }).catch(()=>{ s.querySelector('#dCard').innerHTML='<p class="qhint">Không tải được từ điển, bạn kiểm tra mạng nhé.</p>'; });
