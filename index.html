@@ -571,7 +571,11 @@ body:not([data-tab="cards"]) .backgt{display:none}
 .cth{display:flex;gap:10px;align-items:center;margin:6px 0 8px}.cth span{font-size:28px}.cth b{font-size:16px}.cth small{display:block;color:var(--muted);font-size:12.5px}
 .ctc{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--gold-soft);border-radius:16px;padding:10px 12px;margin-bottom:8px;box-shadow:0 8px 20px -18px rgba(120,95,60,.6)}
 .ctz{flex:none;width:68px;border:2px solid #E86A9A;border-radius:14px;background:var(--paper);display:flex;flex-direction:column;align-items:center;padding:6px 0 4px;cursor:pointer}
-.ctz span{font-family:var(--hz);font-size:40px;font-weight:800;line-height:1.1}.ctz em{margin:2px 0 0;font-style:normal}
+.ctz span{font-family:var(--hz);font-size:40px;font-weight:800;line-height:1.1}.ctz .ctpy{font-size:13px;font-weight:700;color:var(--red);margin-top:1px}
+.ctf span.ctp{display:inline-flex;flex-direction:column;align-items:center;line-height:1.15;padding:3px 7px}
+.ctf span.ctp small{font-family:var(--ui);font-size:11px;font-weight:600;opacity:.85}
+.ctc.covered .ctz .ctpy,.ctc.covered .ctr small{filter:blur(6px)}
+.ctz em{margin:2px 0 0;font-style:normal}
 .ctt{flex:1;min-width:0}
 .ctf{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-family:var(--hz);font-size:19px;font-weight:700}
 .ctf span{background:var(--red-soft);color:var(--red);border-radius:8px;padding:1px 7px}.ctf span.ctr{background:var(--red);color:#fff}
@@ -2647,6 +2651,7 @@ const A = window.APP; if(!A || A.ctList) return;
 const $ = s => document.querySelector(s); const esc=A.esc;
 const root = () => $('#hzv');
 let cover = A.store.get('ctCover', false);
+const PY = x => (A.CIT && A.CIT[x]) || (((window.DATA&&DATA.comp)||{})[x]||{}).py || (((window.DATA&&DATA.rad)||{})[x]||{}).py || '';
 function list(){
   const D = (window.DATA && DATA.ct) || [];
   root().innerHTML = `<div class="qwrap">${A.hzSwitch('ct')}
@@ -2655,7 +2660,7 @@ function list(){
     <div class="dctl" style="justify-content:flex-start"><button class="pbtn ghost sm${cover?' on':''}" id="ctCover">${cover?'Đang che chữ, chạm để hiện':'Tự kiểm tra: che chữ'}</button></div>
     <div class="ctnav">${D.map((dk,i)=>`<a href="#" data-i="${i}">${dk.emo} ${esc(dk.t.replace('Chữ có ',''))}</a>`).join('')}</div>
     ${D.map((dk,i)=>`<div class="ctdeck" id="ctd${i}"><div class="cth"><span>${dk.emo}</span><div><b>${esc(dk.t)}</b><small>${esc(dk.e)}</small></div></div>
-      ${dk.items.map(it=>{ const w = A.C[it[0]]; const lv = w ? (w.lv||1) : 0; return `<div class="ctc${cover?' covered':''}"><button class="ctz" data-c="${esc(it[0])}"><span>${esc(it[0])}</span>${lv?`<em class="lvb l${lv}">HSK ${lv}</em>`:''}</button><div class="ctt"><div class="ctf">${it[1].split('+').map(p=>`<span>${esc(p.trim())}</span>`).join('<i>+</i>')}<i>=</i><span class="ctr">${esc(it[0])}</span>${A.pbtn ? A.pbtn(it[0]) : ''}</div><p>${esc(it[2])}</p></div></div>`; }).join('')}
+      ${dk.items.map(it=>{ const w = A.C[it[0]]; const lv = w ? (w.lv||1) : 0; return `<div class="ctc${cover?' covered':''}"><button class="ctz" data-c="${esc(it[0])}"><span>${esc(it[0])}</span><small class="ctpy">${esc(PY(it[0]))}</small>${lv?`<em class="lvb l${lv}">HSK ${lv}</em>`:''}</button><div class="ctt"><div class="ctf">${it[1].split('+').map(p=>`<span class="ctp">${esc(p.trim())}<small>${esc(PY(p.trim()))}</small></span>`).join('<i>+</i>')}<i>=</i><span class="ctp ctr">${esc(it[0])}<small>${esc(PY(it[0]))}</small></span>${A.pbtn ? A.pbtn(it[0]) : ''}</div><p>${esc(it[2])}</p></div></div>`; }).join('')}
     </div>`).join('')}
   </div>`;
   A.hzWireSw && A.hzWireSw();
